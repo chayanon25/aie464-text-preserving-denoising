@@ -1,0 +1,34 @@
+{
+  "cnn_l1": {
+    "precision": "FP32",
+    "best_epoch": 20,
+    "test_psnr": 27.705677032470703,
+    "test_ssim": 0.9809858128428459,
+    "latency_ms_per_page": 3.6452911249919375,
+    "peak_vram_mb": 39.814453125
+  },
+  "dncnn_lite": {
+    "precision": "FP32",
+    "best_epoch": 13,
+    "test_psnr": 31.668518781661987,
+    "test_ssim": 0.9917776957154274,
+    "latency_ms_per_page": 9.386548749991638,
+    "peak_vram_mb": 67.09033203125
+  },
+  "unet_l1": {
+    "precision": "FP32",
+    "best_epoch": 18,
+    "test_psnr": 31.505592584609985,
+    "test_ssim": 0.9862413307030996,
+    "latency_ms_per_page": 6.920374374999483,
+    "peak_vram_mb": 116.49560546875
+  },
+  "unet_edge": {
+    "precision": "FP32",
+    "best_epoch": 18,
+    "test_psnr": 31.865450859069824,
+    "test_ssim": 0.9898252015312513,
+    "latency_ms_per_page": 6.059807874990497,
+    "peak_vram_mb": 116.49560546875
+  }
+}

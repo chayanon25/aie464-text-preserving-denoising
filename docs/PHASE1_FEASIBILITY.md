@@ -1,5 +1,7 @@
 # Phase 1 — Real-data dataset feasibility (2026-10-12)
 
+> **เอกสารประวัติการวางแผน/พัฒนา:** เนื้อหาและสถานะด้านล่างบันทึกไว้ก่อนชุด Final และอาจต่างจาก implementation จริง ผลล่าสุดใช้ [Final Notebook](../mini_project/FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb) และ [Presentation Brief](PRESENTATION_BRIEF.md) เป็นหลัก Notebook รุ่นพัฒนาที่กล่าวถึงเก็บไว้ในเครื่องและไม่รวมใน GitHub
+
 Status: real-data pairing, DataLoader and 10-pair visual review completed.
 The data pipeline is feasible. A seed-42 group-aware split now keeps all four
 variants of each identical clean document together, with zero group overlap.

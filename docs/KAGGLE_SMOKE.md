@@ -1,5 +1,7 @@
 # Kaggle — GPU Smoke เท่านั้น
 
+> **เอกสารประวัติการวางแผน/พัฒนา:** เนื้อหาและสถานะด้านล่างบันทึกไว้ก่อนชุด Final และอาจต่างจาก implementation จริง ผลล่าสุดใช้ [Final Notebook](../mini_project/FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb) และ [Presentation Brief](PRESENTATION_BRIEF.md) เป็นหลัก Notebook รุ่นพัฒนาที่กล่าวถึงเก็บไว้ในเครื่องและไม่รวมใน GitHub
+
 Notebook: `mini_project/notebooks/04_final_benchmark_kaggle.ipynb`
 ดัดแปลง environment จาก Colab โดยไม่เปลี่ยน Dataset, models, loss,
 Train/Validation protocol หรือ frozen split manifest

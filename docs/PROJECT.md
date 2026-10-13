@@ -1,5 +1,7 @@
 # Project Specification: Text-Preserving Image Denoising
 
+> **เอกสารประวัติการวางแผน/พัฒนา:** เนื้อหาและสถานะด้านล่างบันทึกไว้ก่อนชุด Final และอาจต่างจาก implementation จริง ผลล่าสุดใช้ [Final Notebook](../mini_project/FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb) และ [Presentation Brief](PRESENTATION_BRIEF.md) เป็นหลัก Notebook รุ่นพัฒนาที่กล่าวถึงเก็บไว้ในเครื่องและไม่รวมใน GitHub
+
 > **วิชา:** AIE464 Applied Artificial Intelligence (Bangkok University)  
 > **สถานะปัจจุบัน:** 🟡 **Specification & Planning Phase** (ยังไม่มีผลการ Train หรือ Benchmark จริง)
 

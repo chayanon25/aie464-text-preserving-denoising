@@ -6,14 +6,56 @@
 !/docs/
 !/mini_project/
 
+# Keep existing project references and the verified presentation brief only.
+/docs/*
+!/docs/PROJECT.md
+!/docs/DATASET.md
+!/docs/FINAL_BENCHMARK.md
+!/docs/PHASE1_FEASIBILITY.md
+!/docs/PHASE2A_SANITY.md
+!/docs/KAGGLE_SMOKE.md
+!/docs/KAGGLE_FULL_TRAINING.md
+!/docs/PRESENTATION_BRIEF.md
+
 /mini_project/*
 !/mini_project/README.md
 !/mini_project/PROJECT_SPEC.md
 !/mini_project/prepare_benchmark_bundle.py
 !/mini_project/src/
 !/mini_project/tests/
-!/mini_project/notebooks/
 !/mini_project/outputs/
+!/mini_project/FINAL_SUBMISSION/
+!/mini_project/results/
+
+# Legacy notebooks stay local. Publish one immutable final notebook only.
+/mini_project/FINAL_SUBMISSION/*
+!/mini_project/FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb
+
+# Development code remains available; recovery experiments stay local.
+/mini_project/src/*
+!/mini_project/src/*.py
+!/mini_project/src/models/
+/mini_project/src/models/*
+!/mini_project/src/models/*.py
+/mini_project/tests/*
+!/mini_project/tests/smoke_benchmark.py
+
+# Explicit allowlist for the eight byte-verified copies from the final ZIP.
+/mini_project/results/*
+!/mini_project/results/final/
+/mini_project/results/final/*
+!/mini_project/results/final/final_test_benchmark.json
+!/mini_project/results/final/qualitative_test_comparisons.png
+!/mini_project/results/final/qualitative_zoom_comparisons.png
+!/mini_project/results/final/training_validation_curves.png
+!/mini_project/results/final/logs/
+/mini_project/results/final/logs/*
+!/mini_project/results/final/logs/cnn_l1/
+!/mini_project/results/final/logs/dncnn_lite/
+!/mini_project/results/final/logs/unet_l1/
+!/mini_project/results/final/logs/unet_edge/
+/mini_project/results/final/logs/*/*
+!/mini_project/results/final/logs/*/validation.json
 
 # Keep the frozen split metadata, never experiment outputs or checkpoints.
 /mini_project/outputs/*
