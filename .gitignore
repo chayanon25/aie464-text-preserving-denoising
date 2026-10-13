@@ -1,0 +1,87 @@
+# Repository root: AIE464. Allow only the mini-project and its documentation.
+# Coursework, rosters and unrelated top-level files stay local.
+/*
+!/.gitignore
+!/README.md
+!/docs/
+!/mini_project/
+
+/mini_project/*
+!/mini_project/README.md
+!/mini_project/PROJECT_SPEC.md
+!/mini_project/prepare_benchmark_bundle.py
+!/mini_project/src/
+!/mini_project/tests/
+!/mini_project/notebooks/
+!/mini_project/outputs/
+
+# Keep the frozen split metadata, never experiment outputs or checkpoints.
+/mini_project/outputs/*
+!/mini_project/outputs/phase1/
+/mini_project/outputs/phase1/*
+!/mini_project/outputs/phase1/split_manifest.json
+
+# Datasets and archives belong in local storage / Google Drive.
+**/data/
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.7z
+*.rar
+
+# Model weights and large numerical artifacts.
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.bin
+
+# Credentials and secrets: never add these with git add -f.
+.env
+.env.*
+*.env
+.kaggle/
+kaggle*.json
+credentials*.json
+token*.json
+secrets*.json
+*service-account*.json
+*service_account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+.aws/
+.ssh/
+.gcp/
+.netrc
+.npmrc
+.pypirc
+
+# Python, notebook, tool and OS caches.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+*.egg-info/
+.coverage
+htmlcov/
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
