@@ -53,3 +53,9 @@ def test_gray_testset_metrics_and_save(tmp_path):
     assert {'psnr', 'ssim', 'text_psnr'} <= set(res['per_image'][0])
     save_eval(res, tmp_path / 'x.json')
     assert json.loads((tmp_path / 'x.json').read_text())['name'] == 'noisy'
+
+
+def test_load_testsets_required_missing_raises(tmp_path):
+    from src.eval_suite import load_testsets
+    with pytest.raises(FileNotFoundError):
+        load_testsets(tmp_path, MANIFEST, tmp_path, tmp_path, required=('kaggle_test', 'dibco2017'))

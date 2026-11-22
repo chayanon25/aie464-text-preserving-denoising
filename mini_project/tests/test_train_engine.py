@@ -70,3 +70,9 @@ def test_init_from_job(tmp_path, tiny_data):
     run_job(tiny_cfg(), tmp_path / 'base', tiny_data, 'cpu')
     out = run_job(replace(tiny_cfg(init_from='base'), job_id='ft'), tmp_path / 'ft', tiny_data, 'cpu')
     assert out['status'] == 'done'
+
+
+def test_progress_callback_called_within_epoch(tmp_path, tiny_data):
+    calls = []
+    run_job(tiny_cfg(), tmp_path, tiny_data, 'cpu', on_progress=lambda: calls.append(1), progress_every=1)
+    assert len(calls) >= 4   # 2 steps/epoch x 2 epochs

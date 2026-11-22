@@ -98,7 +98,8 @@ def get_testsets():
         return SMOKE_SETS['testsets']
     from src.eval_suite import load_testsets
     return load_testsets(DATA_ROOT / 'raw', MINI / 'outputs' / 'phase1' / 'split_manifest.json',
-                         DATA_ROOT / 'external' / 'augraphy_shift', DATA_ROOT / 'external' / 'dibco')
+                         DATA_ROOT / 'external' / 'augraphy_shift', DATA_ROOT / 'external' / 'dibco',
+                         required=('kaggle_test', 'augraphy_shift', 'dibco2017'))
 print('device:', DEVICE)
 '''
 
@@ -125,7 +126,7 @@ from src.train_engine import run_job
 if JOB_ID:
     cfg = budgeted(JOB_ID)
     REGISTRY.add(cfg)
-    REGISTRY.mark(JOB_ID, 'running')
+    REGISTRY.mark(JOB_ID, 'running', owner=OWNER)
 else:
     cfg = REGISTRY.claim_next(OWNER)
 if cfg is None:
@@ -138,12 +139,12 @@ else:
         if left <= 0:
             break
         result = run_job(cfg, RUNS_ROOT / cfg.job_id, data, DEVICE, max_minutes=left, max_epochs=1,
-                         runs_root=RUNS_ROOT)
-        REGISTRY.heartbeat(cfg.job_id)
+                         runs_root=RUNS_ROOT, on_progress=lambda: REGISTRY.heartbeat(cfg.job_id, owner=OWNER))
+        REGISTRY.heartbeat(cfg.job_id, owner=OWNER)
         last = result['history'][-1] if result['history'] else {}
         print(cfg.job_id, result['status'], last)
         if result['status'] == 'done':
-            REGISTRY.mark(cfg.job_id, 'done')
+            REGISTRY.mark(cfg.job_id, 'done', owner=OWNER)
             break
     print('finished call with status:', result and result['status'])
 '''

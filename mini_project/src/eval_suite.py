@@ -40,8 +40,9 @@ def predict_fn(model, device, tile=None, amp=False):
     return lambda img: denoise(model, img, device, tile=tile, amp=amp)
 
 
-def load_testsets(kaggle_root=None, manifest=None, shift_dir=None, dibco_root=None):
-    """Load every available test set; missing data is skipped silently."""
+def load_testsets(kaggle_root=None, manifest=None, shift_dir=None, dibco_root=None, required=()):
+    """Load every available test set. Sets named in `required` must exist, so
+    every model is scored on the same sets (fair comparison)."""
     sets = {}
     if kaggle_root and manifest and (Path(kaggle_root) / 'train').is_dir():
         sets['kaggle_test'] = load_kaggle_split(kaggle_root, manifest, 'test')
@@ -49,6 +50,9 @@ def load_testsets(kaggle_root=None, manifest=None, shift_dir=None, dibco_root=No
         sets['augraphy_shift'] = load_shift_testset(shift_dir)
     if dibco_root and (Path(dibco_root) / 'dibco2017').is_dir():
         sets['dibco2017'] = load_dibco(dibco_root, 2017)
+    missing = [name for name in required if name not in sets]
+    if missing:
+        raise FileNotFoundError(f'Required test sets missing: {missing}')
     return sets
 
 

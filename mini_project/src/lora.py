@@ -51,13 +51,18 @@ def _replace_children(module, fn):
             _replace_children(child, fn)
 
 
-def apply_lora(model, rank, alpha=None):
-    """Freeze everything, wrap every 3x3 (groups=1) conv with LoRA; return trainable count."""
+def apply_lora(model, rank, alpha=None, include_1x1=False):
+    """Freeze everything, wrap every 3x3 (groups=1) conv with LoRA; return trainable count.
+
+    include_1x1 also wraps 1x1 groups=1 convs. NAFNet's 3x3 convs are depthwise,
+    so without it only intro/ending would adapt.
+    """
     for p in model.parameters():
         p.requires_grad_(False)
 
     def wrap(child):
-        if isinstance(child, nn.Conv2d) and child.kernel_size == (3, 3) and child.groups == 1:
+        kernels = ((3, 3), (1, 1)) if include_1x1 else ((3, 3),)
+        if isinstance(child, nn.Conv2d) and child.kernel_size in kernels and child.groups == 1:
             return LoRAConv2d(child, rank, alpha)
         return child
 

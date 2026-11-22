@@ -53,3 +53,17 @@ def test_prepare_model_lora_from_midterm():
     except FileNotFoundError:
         return
     assert any(isinstance(mod, LoRAConv2d) for mod in m.modules())
+
+
+def test_lora_1x1_reaches_nafnet_blocks():
+    m = build_model('nafnet'); total = sum(p.numel() for p in m.parameters())
+    n = apply_lora(m, 8, include_1x1=True)
+    assert n > 0.01 * total
+    m.eval(); x = torch.rand(1, 1, 32, 32)
+    for mod in m.modules():
+        if isinstance(mod, LoRAConv2d): nn.init.normal_(mod.B.weight, std=0.01)
+    y = m(x); assert torch.allclose(merge_lora(m)(x), y, atol=1e-4)
+
+
+def test_nafnet_lora_job_uses_1x1():
+    assert JOBS['nafnet_ft_dibco_lora8'].lora_1x1 is True

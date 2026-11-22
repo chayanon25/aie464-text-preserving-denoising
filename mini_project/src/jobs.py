@@ -13,7 +13,7 @@ from pathlib import Path
 
 from .train_engine import JobConfig
 
-STALE_MINUTES = 20
+STALE_MINUTES = 20   # run_job heartbeats within epochs (on_progress), not only between them
 
 
 def now():
@@ -51,18 +51,29 @@ class JobRegistry:
             if entry['status'] == 'pending' or stale:
                 entry.update(status='running', owner=owner, heartbeat=now())
                 self._write(data)
+                # Best-effort race check: re-read and confirm we still own it.
+                if self._read()[job_id].get('owner') != owner:
+                    continue
                 return JobConfig.from_dict(entry['config'])
         return None
 
-    def heartbeat(self, job_id):
+    def _check_owner(self, entry, job_id, owner):
+        if owner is not None and entry.get('owner') not in (None, owner):
+            raise PermissionError(f'{job_id} is owned by {entry["owner"]}, not {owner}')
+
+    def heartbeat(self, job_id, owner=None):
         data = self._read()
+        self._check_owner(data[job_id], job_id, owner)
         data[job_id]['heartbeat'] = now()
         self._write(data)
 
-    def mark(self, job_id, status):
+    def mark(self, job_id, status, owner=None):
         if status not in ('pending', 'running', 'done', 'failed'):
             raise ValueError(f'Unknown status: {status}')
         data = self._read()
+        self._check_owner(data[job_id], job_id, owner)
+        if owner is not None:
+            data[job_id]['owner'] = owner
         data[job_id]['status'] = status
         data[job_id]['heartbeat'] = now()
         self._write(data)

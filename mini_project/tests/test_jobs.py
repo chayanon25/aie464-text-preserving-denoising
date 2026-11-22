@@ -30,3 +30,14 @@ def test_registry_fresh_running_not_reclaimed(tmp_path):
 def test_registry_add_idempotent_and_atomic(tmp_path):
     r = JobRegistry(tmp_path / 'jobs.json'); r.add(tiny_cfg()); r.mark('t', 'done'); r.add(tiny_cfg())
     assert r.status('t') == 'done' and not list(tmp_path.glob('*.tmp'))
+
+
+def test_registry_rejects_foreign_owner(tmp_path):
+    import pytest
+    r = JobRegistry(tmp_path / 'jobs.json'); r.add(tiny_cfg()); r.claim_next('acc1')
+    with pytest.raises(PermissionError):
+        r.heartbeat('t', owner='acc2')
+    with pytest.raises(PermissionError):
+        r.mark('t', 'done', owner='acc2')
+    r.mark('t', 'done', owner='acc1')
+    assert r.status('t') == 'done'

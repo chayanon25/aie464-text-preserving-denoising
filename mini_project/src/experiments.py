@@ -30,7 +30,7 @@ _jobs = [
     JobConfig(job_id='nafnet_short_ft', data='kaggle', init_from='nafnet:sidd', **_NAF),
     JobConfig(job_id='nafnet_ft', data='kaggle', init_from='nafnet:sidd', **_NAF),
     JobConfig(job_id='nafnet_ft_dibco_full', data='dibco', init_from='nafnet_ft', **_NAF),
-    JobConfig(job_id='nafnet_ft_dibco_lora8', data='dibco', init_from='nafnet_ft', lora_rank=8,
+    JobConfig(job_id='nafnet_ft_dibco_lora8', data='dibco', init_from='nafnet_ft', lora_rank=8, lora_1x1=True,
               **{**_NAF, 'lr': 1e-3, 'min_lr': 1e-5}),
 ]
 JOBS = {job.job_id: job for job in _jobs}
