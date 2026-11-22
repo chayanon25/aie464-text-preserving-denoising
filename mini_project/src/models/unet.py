@@ -26,4 +26,10 @@ class SmallUNet(nn.Module):
         x = self.bridge(F.max_pool2d(c, 2))
         for skip, decoder in ((c, self.dec3), (b, self.dec2), (a, self.dec1)):
             x = decoder(torch.cat([F.interpolate(x, size=skip.shape[-2:], mode='nearest'), skip], dim=1))
-        return self.head(x).sigmoid()[..., :height, :width]
+        # Residual output as in the midterm notebook (cell 5): predict the noise.
+        noise = self.head(x)[..., :height, :width]
+        return noisy - noise
+
+    def encoder_modules(self):
+        """Encoder path (frozen by the freeze-encoder fine-tune)."""
+        return [self.enc1, self.enc2, self.enc3, self.bridge]
