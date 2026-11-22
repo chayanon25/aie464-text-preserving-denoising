@@ -47,7 +47,8 @@ Notebook นี้คือไฟล์ที่ใช้เทรนและ�
 |---|---|---|---|---|
 | Kaggle Denoising Dirty Documents | [kaggle.com/c/denoising-dirty-documents](https://www.kaggle.com/c/denoising-dirty-documents) | train / val / **test (in-domain)** | test 24 ภาพจาก 6 หน้าต้นฉบับ แบ่งระดับหน้าเพื่อกัน data leakage | PSNR, SSIM, text PSNR |
 | Augraphy shift | สร้างจาก Kaggle test ด้วยไลบรารี [Augraphy](https://github.com/sparkfish/augraphy) แบบ deterministic | test เท่านั้น | 24 ภาพ | เหมือน Kaggle |
-| DIBCO 2017 | [Document Image Binarization Contest 2017](https://vc.ee.duth.gr/dibco2017/) | fine-tune + **test (cross-dataset)** | test 20 ภาพ (printed 10, handwritten 10) | binarize ด้วย Otsu แล้ววัด FM, pFM, PSNR, DRD |
+| DIBCO 2017 | [Document Image Binarization Contest 2017](https://vc.ee.duth.gr/dibco2017/) | **test (cross-dataset)** เท่านั้น | 20 ภาพ (printed 10, handwritten 10) | binarize ด้วย Otsu แล้ววัด FM, pFM, PSNR, DRD |
+| DIBCO 2018 + 2019A | การแข่งขัน DIBCO ปีถัดมา (H-DIBCO 2018, DIBCO 2019 track A) | fine-tune เท่านั้น (ไม่ใช้ปี 2017 เพื่อกัน data leakage) | 20 หน้า แบ่ง train 16 / val 4 (seed 42) | val PSNR |
 
 - **Data leakage:** แบ่ง train/val/test ระดับหน้าเอกสารก่อนตัด patch ภาพจากหน้าเดียวกันจึงไม่อยู่คนละชุด
 - **text PSNR:** PSNR เฉพาะบริเวณตัวอักษร
@@ -76,7 +77,7 @@ $$\text{loss} = L_1(\hat{y}, y) + \lambda \cdot L_1(\text{Sobel}(\hat{y}), \text
 
 | สัปดาห์ | เทคนิค | Job |
 |---|---|---|
-| W9 | Transfer learning / fine-tune ข้าม dataset (Kaggle → DIBCO): full FT และ freeze encoder | `ft_full`, `ft_freeze_enc`, `nafnet_ft_dibco_full` |
+| W9 | Transfer learning / fine-tune ข้าม dataset (Kaggle → DIBCO 2018+2019A, test บน DIBCO 2017): full FT และ freeze encoder | `ft_full`, `ft_freeze_enc`, `nafnet_ft_dibco_full` |
 | W9 | Pretrained model ภายนอก: NAFNet (เทรนบน SIDD) ทดสอบ zero-shot แล้ว fine-tune บน Kaggle | `nafnet_zeroshot`, `nafnet_ft` |
 | W10 | Knowledge Distillation: teacher `unet_edge_aug` → student ShallowCNN (7k params) | `kd_cnn` |
 | W12 | Parameter-efficient fine-tune: LoRA บน conv (rank 4 / 8) | `ft_lora4`, `ft_lora8`, `nafnet_ft_dibco_lora8` |
