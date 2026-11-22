@@ -6,7 +6,7 @@
 
 ## ไฟล์สำหรับเปิดดูและทำสไลด์
 
-- [Presentation Brief สำหรับเพื่อนทำสไลด์](docs/PRESENTATION_BRIEF.md)
+- [Improvement Report สำหรับเพื่อนทำสไลด์](docs/IMPROVEMENT_REPORT.md)
 - [Final Notebook พร้อม outputs การทดลองจริง](mini_project/FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb)
 - [Benchmark JSON — ตัวเลขเต็มก่อนปัดเศษ](mini_project/results/final/final_test_benchmark.json)
 - Artifacts ZIP ต้นฉบับและไฟล์ SHA256 ซึ่งเป็นรหัสตรวจความสมบูรณ์ของไฟล์ อยู่ในเครื่องที่ `mini_project/FINAL_SUBMISSION/aie464_final_artifacts.zip` และ `mini_project/FINAL_SUBMISSION/aie464_final_artifacts.zip.sha256`; ไม่รวมใน Repository อ่านรหัส SHA256 ได้ในส่วนท้ายของหน้านี้
@@ -115,7 +115,7 @@ Crop 120×120 พิกเซลจากคู่ภาพตัวอย่า
 
 ## วิธีเปิดดูและเตรียมรันซ้ำ
 
-สำหรับทำสไลด์ ใช้ [Presentation Brief](docs/PRESENTATION_BRIEF.md), JSON และภาพข้างต้น เปิดดู saved outputs ใน Final Notebook ได้โดยไม่ต้อง Run All
+สำหรับทำสไลด์ ใช้ [Improvement Report](docs/IMPROVEMENT_REPORT.md), JSON และภาพข้างต้น เปิดดู saved outputs ใน Final Notebook ได้โดยไม่ต้อง Run All
 
 หากได้รับอนุมัติให้รันซ้ำในภายหลัง:
 

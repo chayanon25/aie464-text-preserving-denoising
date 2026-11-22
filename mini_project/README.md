@@ -1,6 +1,6 @@
 # Development Pipeline — AIE464 Text-Preserving Image Denoising
 
-> **Final Implementation อยู่ใน [Final Notebook](FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb)** ซึ่งมีโค้ดและ outputs จริงครบชุด ดู [README ปัจจุบัน](../README.md) และ [Presentation Brief](../docs/PRESENTATION_BRIEF.md) สำหรับผลและการทำสไลด์
+> **Final Implementation อยู่ใน [Final Notebook](FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb)** ซึ่งมีโค้ดและ outputs จริงครบชุด ดู [README ปัจจุบัน](../README.md) และ [Improvement Report](../docs/IMPROVEMENT_REPORT.md) สำหรับผลและการทำสไลด์
 >
 > `src/`, `prepare_benchmark_bundle.py` และ `tests/smoke_benchmark.py` เก็บไว้เป็น Development Pipeline รุ่นเดิม U-Net ใน `src/` ใช้ Sigmoid output ขณะที่ Final Notebook ใช้ residual output จึงไม่ใช่ implementation เดียวกับ Final Benchmark เนื้อหาวิธีรันและสถานะด้านล่างเป็นบันทึกช่วงพัฒนา Notebook `02a`, `03`, `04`, `05` อยู่ในเครื่องและเลิกติดตามใน Git; `prepare_benchmark_bundle.py` ยังต้องใช้ Notebook `03` ในเครื่อง จึงไม่ใช่คำสั่งรันจาก GitHub clone ใหม่โดยลำพัง
 
@@ -62,7 +62,6 @@ Resume และ approval gates ยังไม่ได้ยืนยัน CU
 
 - [PROJECT.md](../docs/PROJECT.md) และ [DATASET.md](../docs/DATASET.md): เอกสารหลัก
 - [FINAL_BENCHMARK.md](../docs/FINAL_BENCHMARK.md): protocol, ZIP, Resume และหลักฐานจริง
-- [PHASE2A_SANITY.md](../docs/PHASE2A_SANITY.md): notebook CNN ขั้นต้น
 - `PROJECT_SPEC.md`: เอกสารแนวคิดเดิม ใช้เอกสารหลักข้างต้นสำหรับขอบเขตปัจจุบัน
 
 Git เก็บ Final Notebook, เอกสาร, source/scripts, frozen manifest และสำเนาผลสุดท้าย 8 ไฟล์ตาม allowlist หรือรายการอนุญาตเฉพาะไฟล์; Dataset, ZIP, checkpoints,

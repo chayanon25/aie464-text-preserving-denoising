@@ -1,6 +1,6 @@
 # AIE464 Mini-Project Specification: Image Denoising
 
-> **เอกสารแนวคิดเดิม:** เนื้อหาด้านล่างเป็นแผนก่อนชุด Final ผลและวิธีที่ใช้จริงดู [Final Notebook](FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb) และ [Presentation Brief](../docs/PRESENTATION_BRIEF.md) รายชื่อชั้นเรียนหรือเอกสารส่วนตัวที่กล่าวถึงไม่รวมใน Repository
+> **เอกสารแนวคิดเดิม:** เนื้อหาด้านล่างเป็นแผนก่อนชุด Final ผลและวิธีที่ใช้จริงดู [Final Notebook](FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb) และ [Improvement Report](../docs/IMPROVEMENT_REPORT.md) รายชื่อชั้นเรียนหรือเอกสารส่วนตัวที่กล่าวถึงไม่รวมใน Repository
 
 > **เอกสารสรุปข้อกำหนด ขอบเขตงาน และแนวทางการพัฒนา Mini-Project**  
 > **วิชา:** AIE464 Applied Artificial Intelligence (Bangkok University)  
