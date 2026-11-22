@@ -1,0 +1,149 @@
+{
+  "pilot_unet_edge_aug": {
+    "median_ms": 8.50340749911993,
+    "p90_ms": 10.838066000360413,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "nafnet_short_ft": {
+    "median_ms": 133.02548000046954,
+    "p90_ms": 135.0885701001971,
+    "peak_vram_mb": 374.7978515625,
+    "params": 29159715,
+    "device": "Tesla T4"
+  },
+  "unet_edge_aug": {
+    "median_ms": 8.800196000265714,
+    "p90_ms": 9.039621399097086,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "nafnet_ft": {
+    "median_ms": 140.55979699969612,
+    "p90_ms": 142.9561842995099,
+    "peak_vram_mb": 374.7978515625,
+    "params": 29159715,
+    "device": "Tesla T4"
+  },
+  "dncnn_nobn_aug": {
+    "median_ms": 12.049735000800865,
+    "p90_ms": 12.257191999378847,
+    "peak_vram_mb": 56.5166015625,
+    "params": 46849,
+    "device": "Tesla T4"
+  },
+  "unet_aug_l0": {
+    "median_ms": 9.258523999960744,
+    "p90_ms": 9.509356501075672,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "unet_aug_l05": {
+    "median_ms": 9.335417000329471,
+    "p90_ms": 9.567378499559709,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "unet_edge_aug_s43": {
+    "median_ms": 9.246748000805383,
+    "p90_ms": 9.389548898798239,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "unet_edge_aug_s44": {
+    "median_ms": 9.4498204998672,
+    "p90_ms": 9.739658999387757,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "kd_cnn": {
+    "median_ms": 4.004723000434751,
+    "p90_ms": 4.134202298700984,
+    "peak_vram_mb": 30.73876953125,
+    "params": 7265,
+    "device": "Tesla T4"
+  },
+  "ft_full": {
+    "median_ms": 9.566179999637825,
+    "p90_ms": 9.709941299661295,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "ft_freeze_enc": {
+    "median_ms": 9.477022499595478,
+    "p90_ms": 9.942005899392825,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "ft_lora4": {
+    "median_ms": 17.602176500076894,
+    "p90_ms": 17.82986060006806,
+    "peak_vram_mb": 133.07421875,
+    "params": 518661,
+    "device": "Tesla T4"
+  },
+  "ft_lora8": {
+    "median_ms": 18.066782500682166,
+    "p90_ms": 18.32821950010839,
+    "peak_vram_mb": 133.19287109375,
+    "params": 550313,
+    "device": "Tesla T4"
+  },
+  "nafnet_ft_dibco_full": {
+    "median_ms": 154.62449000006018,
+    "p90_ms": 157.35990820066945,
+    "peak_vram_mb": 374.7978515625,
+    "params": 29159715,
+    "device": "Tesla T4"
+  },
+  "nafnet_ft_dibco_lora8": {
+    "median_ms": 212.49663500020688,
+    "p90_ms": 218.91425260073447,
+    "peak_vram_mb": 491.46337890625,
+    "params": 30131731,
+    "device": "Tesla T4"
+  },
+  "midterm_cnn_l1": {
+    "median_ms": 3.778690000217466,
+    "p90_ms": 3.829894500086084,
+    "peak_vram_mb": 30.73876953125,
+    "params": 7265,
+    "device": "Tesla T4"
+  },
+  "midterm_dncnn_lite": {
+    "median_ms": 11.917028999960166,
+    "p90_ms": 12.064831398856768,
+    "peak_vram_mb": 56.5263671875,
+    "params": 47009,
+    "device": "Tesla T4"
+  },
+  "midterm_unet_l1": {
+    "median_ms": 8.59039799979655,
+    "p90_ms": 8.799618099692452,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "midterm_unet_edge": {
+    "median_ms": 8.880858499651367,
+    "p90_ms": 9.193329400295625,
+    "peak_vram_mb": 106.716796875,
+    "params": 487009,
+    "device": "Tesla T4"
+  },
+  "nafnet_zeroshot": {
+    "median_ms": 136.1476969996147,
+    "p90_ms": 138.3047361003264,
+    "peak_vram_mb": 374.7978515625,
+    "params": 29159715,
+    "device": "Tesla T4"
+  }
+}

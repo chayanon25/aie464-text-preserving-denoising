@@ -1,0 +1,676 @@
+{
+  "name": "nafnet_ft",
+  "per_image": [
+    {
+      "testset": "kaggle_test",
+      "id": "14.png",
+      "group": "2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36",
+      "psnr": 29.725326538085938,
+      "ssim": 0.9839128851890564,
+      "text_psnr": 25.12859535217285
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "158.png",
+      "group": "1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874",
+      "psnr": 30.156097412109375,
+      "ssim": 0.9873910546302795,
+      "text_psnr": 24.706439971923828
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "161.png",
+      "group": "1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874",
+      "psnr": 28.883525848388672,
+      "ssim": 0.9889442920684814,
+      "text_psnr": 22.61797332763672
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "164.png",
+      "group": "1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874",
+      "psnr": 30.42852020263672,
+      "ssim": 0.9895730018615723,
+      "text_psnr": 24.982698440551758
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "167.png",
+      "group": "1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874",
+      "psnr": 28.843414306640625,
+      "ssim": 0.9835696816444397,
+      "text_psnr": 22.991531372070312
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "17.png",
+      "group": "2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36",
+      "psnr": 30.385568618774414,
+      "ssim": 0.9904383420944214,
+      "text_psnr": 24.660852432250977
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "20.png",
+      "group": "2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36",
+      "psnr": 30.214881896972656,
+      "ssim": 0.9869431257247925,
+      "text_psnr": 26.146718978881836
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "207.png",
+      "group": "46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6",
+      "psnr": 32.75666427612305,
+      "ssim": 0.9933052062988281,
+      "text_psnr": 27.174842834472656
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "210.png",
+      "group": "46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6",
+      "psnr": 34.0956916809082,
+      "ssim": 0.996385395526886,
+      "text_psnr": 27.312652587890625
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "213.png",
+      "group": "46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6",
+      "psnr": 34.544185638427734,
+      "ssim": 0.9970605969429016,
+      "text_psnr": 28.84002685546875
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "216.png",
+      "group": "46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6",
+      "psnr": 31.839920043945312,
+      "ssim": 0.9925694465637207,
+      "text_psnr": 24.587257385253906
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "23.png",
+      "group": "2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36",
+      "psnr": 28.66649627685547,
+      "ssim": 0.9825557470321655,
+      "text_psnr": 23.198463439941406
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "38.png",
+      "group": "f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655",
+      "psnr": 31.932968139648438,
+      "ssim": 0.9919816851615906,
+      "text_psnr": 26.83074188232422
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "41.png",
+      "group": "f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655",
+      "psnr": 32.96684646606445,
+      "ssim": 0.9956302642822266,
+      "text_psnr": 26.394943237304688
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "44.png",
+      "group": "f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655",
+      "psnr": 32.126319885253906,
+      "ssim": 0.9940612316131592,
+      "text_psnr": 26.889097213745117
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "47.png",
+      "group": "f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655",
+      "psnr": 29.70369529724121,
+      "ssim": 0.9885317087173462,
+      "text_psnr": 23.090412139892578
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "63.png",
+      "group": "4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8",
+      "psnr": 30.75753402709961,
+      "ssim": 0.9887345433235168,
+      "text_psnr": 24.92234992980957
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "66.png",
+      "group": "4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8",
+      "psnr": 33.362979888916016,
+      "ssim": 0.9961186647415161,
+      "text_psnr": 26.579713821411133
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "69.png",
+      "group": "4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8",
+      "psnr": 33.257911682128906,
+      "ssim": 0.995517909526825,
+      "text_psnr": 27.246932983398438
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "72.png",
+      "group": "4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8",
+      "psnr": 30.002262115478516,
+      "ssim": 0.9897868037223816,
+      "text_psnr": 22.598602294921875
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "87.png",
+      "group": "08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e",
+      "psnr": 30.533649444580078,
+      "ssim": 0.9850307106971741,
+      "text_psnr": 24.423171997070312
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "90.png",
+      "group": "08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e",
+      "psnr": 32.26305389404297,
+      "ssim": 0.9941415190696716,
+      "text_psnr": 25.182334899902344
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "93.png",
+      "group": "08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e",
+      "psnr": 31.339893341064453,
+      "ssim": 0.9906432032585144,
+      "text_psnr": 25.829084396362305
+    },
+    {
+      "testset": "kaggle_test",
+      "id": "96.png",
+      "group": "08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e",
+      "psnr": 29.795425415039062,
+      "ssim": 0.98824143409729,
+      "text_psnr": 22.37666130065918
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "87_v0.png",
+      "group": "08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e",
+      "psnr": 17.793251037597656,
+      "ssim": 0.8599572777748108,
+      "text_psnr": 10.545970916748047
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "87_v1.png",
+      "group": "08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e",
+      "psnr": 17.671619415283203,
+      "ssim": 0.8498124480247498,
+      "text_psnr": 10.418560028076172
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "87_v2.png",
+      "group": "08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e",
+      "psnr": 18.375295639038086,
+      "ssim": 0.8673415184020996,
+      "text_psnr": 11.262090682983398
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "87_v3.png",
+      "group": "08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e",
+      "psnr": 17.92615509033203,
+      "ssim": 0.8560495376586914,
+      "text_psnr": 10.653182029724121
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "158_v0.png",
+      "group": "1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874",
+      "psnr": 17.531993865966797,
+      "ssim": 0.837124228477478,
+      "text_psnr": 10.961165428161621
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "158_v1.png",
+      "group": "1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874",
+      "psnr": 17.495155334472656,
+      "ssim": 0.8340804576873779,
+      "text_psnr": 11.086821556091309
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "158_v2.png",
+      "group": "1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874",
+      "psnr": 16.956697463989258,
+      "ssim": 0.8222222328186035,
+      "text_psnr": 10.759866714477539
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "158_v3.png",
+      "group": "1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874",
+      "psnr": 16.649063110351562,
+      "ssim": 0.7985197305679321,
+      "text_psnr": 9.588066101074219
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "14_v0.png",
+      "group": "2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36",
+      "psnr": 17.97076416015625,
+      "ssim": 0.8443162441253662,
+      "text_psnr": 12.073369979858398
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "14_v1.png",
+      "group": "2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36",
+      "psnr": 18.507110595703125,
+      "ssim": 0.8602308630943298,
+      "text_psnr": 12.500070571899414
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "14_v2.png",
+      "group": "2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36",
+      "psnr": 17.65060043334961,
+      "ssim": 0.8313196301460266,
+      "text_psnr": 11.284862518310547
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "14_v3.png",
+      "group": "2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36",
+      "psnr": 18.631088256835938,
+      "ssim": 0.8595725893974304,
+      "text_psnr": 12.689080238342285
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "207_v0.png",
+      "group": "46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6",
+      "psnr": 16.39862060546875,
+      "ssim": 0.8517719507217407,
+      "text_psnr": 9.565818786621094
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "207_v1.png",
+      "group": "46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6",
+      "psnr": 16.97559356689453,
+      "ssim": 0.8761546611785889,
+      "text_psnr": 10.632219314575195
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "207_v2.png",
+      "group": "46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6",
+      "psnr": 15.48987865447998,
+      "ssim": 0.8288747072219849,
+      "text_psnr": 9.047782897949219
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "207_v3.png",
+      "group": "46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6",
+      "psnr": 15.8616943359375,
+      "ssim": 0.8339846730232239,
+      "text_psnr": 9.105056762695312
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "63_v0.png",
+      "group": "4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8",
+      "psnr": 16.15471839904785,
+      "ssim": 0.8231462836265564,
+      "text_psnr": 9.887466430664062
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "63_v1.png",
+      "group": "4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8",
+      "psnr": 17.29274559020996,
+      "ssim": 0.8738465309143066,
+      "text_psnr": 11.702924728393555
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "63_v2.png",
+      "group": "4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8",
+      "psnr": 16.01401710510254,
+      "ssim": 0.8242223262786865,
+      "text_psnr": 10.004537582397461
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "63_v3.png",
+      "group": "4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8",
+      "psnr": 16.51984405517578,
+      "ssim": 0.8375160098075867,
+      "text_psnr": 10.210582733154297
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "38_v0.png",
+      "group": "f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655",
+      "psnr": 17.739032745361328,
+      "ssim": 0.8800787329673767,
+      "text_psnr": 11.726632118225098
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "38_v1.png",
+      "group": "f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655",
+      "psnr": 16.638643264770508,
+      "ssim": 0.8399524092674255,
+      "text_psnr": 10.646821022033691
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "38_v2.png",
+      "group": "f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655",
+      "psnr": 16.82231330871582,
+      "ssim": 0.8445221185684204,
+      "text_psnr": 10.652681350708008
+    },
+    {
+      "testset": "augraphy_shift",
+      "id": "38_v3.png",
+      "group": "f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655",
+      "psnr": 16.8736572265625,
+      "ssim": 0.8445975184440613,
+      "text_psnr": 10.448670387268066
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/1",
+      "group": "handwritten",
+      "fm": 62.25997853335029,
+      "pfm": 82.68264253381861,
+      "psnr": 12.81788857172334,
+      "drd": 8.855679587243472
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/2",
+      "group": "handwritten",
+      "fm": 53.489459793538906,
+      "pfm": 60.99780923767981,
+      "psnr": 11.72873812237482,
+      "drd": 15.408390893654914
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/3",
+      "group": "handwritten",
+      "fm": 63.59756979603645,
+      "pfm": 81.5049219058519,
+      "psnr": 13.762019076575573,
+      "drd": 9.610002293646984
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/4",
+      "group": "handwritten",
+      "fm": 64.44452509708562,
+      "pfm": 81.794529448271,
+      "psnr": 14.856883072467555,
+      "drd": 9.387356975145433
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/5",
+      "group": "handwritten",
+      "fm": 63.17747976319924,
+      "pfm": 79.43220561047603,
+      "psnr": 16.41458798048787,
+      "drd": 10.898277282331081
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/6",
+      "group": "handwritten",
+      "fm": 55.964542796969795,
+      "pfm": 61.66319323232156,
+      "psnr": 8.642828326271893,
+      "drd": 15.807125301920422
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/7",
+      "group": "handwritten",
+      "fm": 50.973823993874724,
+      "pfm": 54.2880405679699,
+      "psnr": 8.606093208350474,
+      "drd": 17.71305015245497
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/8",
+      "group": "handwritten",
+      "fm": 69.84107068172312,
+      "pfm": 82.11765391739436,
+      "psnr": 14.286753738048919,
+      "drd": 9.668234070699937
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/9",
+      "group": "handwritten",
+      "fm": 71.68145988636668,
+      "pfm": 70.18840639252863,
+      "psnr": 12.795888892637226,
+      "drd": 9.666505976245064
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/10",
+      "group": "handwritten",
+      "fm": 74.56938152783191,
+      "pfm": 73.492461649324,
+      "psnr": 12.255938422902158,
+      "drd": 8.078218518102586
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/11",
+      "group": "printed",
+      "fm": 53.58113351615584,
+      "pfm": 44.900871171966315,
+      "psnr": 10.291708839230594,
+      "drd": 23.641156900590733
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/12",
+      "group": "printed",
+      "fm": 73.39089632891675,
+      "pfm": 87.35940524381216,
+      "psnr": 13.59464854332649,
+      "drd": 8.399055798312391
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/13",
+      "group": "printed",
+      "fm": 60.65550204844389,
+      "pfm": 62.08208559984503,
+      "psnr": 11.765555769747174,
+      "drd": 23.120115660699522
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/14",
+      "group": "printed",
+      "fm": 74.60413004919782,
+      "pfm": 86.5816824955443,
+      "psnr": 14.565028758575362,
+      "drd": 8.038809953627545
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/15",
+      "group": "printed",
+      "fm": 79.86355399211172,
+      "pfm": 92.884107610013,
+      "psnr": 12.77482627422193,
+      "drd": 5.91491263921798
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/16",
+      "group": "printed",
+      "fm": 67.79130424065396,
+      "pfm": 66.51530899330409,
+      "psnr": 14.885173433994972,
+      "drd": 14.226803000047454
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/17",
+      "group": "printed",
+      "fm": 72.97532958237714,
+      "pfm": 91.35820308180314,
+      "psnr": 16.401014516011884,
+      "drd": 5.834698958489459
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/18",
+      "group": "printed",
+      "fm": 70.75683674028608,
+      "pfm": 85.88480155587257,
+      "psnr": 12.997258070505369,
+      "drd": 10.0457866201494
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/19",
+      "group": "printed",
+      "fm": 67.0962705271664,
+      "pfm": 72.63973492745559,
+      "psnr": 13.24259836382456,
+      "drd": 14.64669836790508
+    },
+    {
+      "testset": "dibco2017",
+      "id": "2017/20",
+      "group": "printed",
+      "fm": 79.88027248331383,
+      "pfm": 92.54586307989192,
+      "psnr": 13.755515524244867,
+      "drd": 6.442056566563215
+    }
+  ],
+  "summary": {
+    "kaggle_test": {
+      "psnr": 31.190951347351074,
+      "ssim": 0.9904611855745316,
+      "text_psnr": 25.196337461471558,
+      "n": 24
+    },
+    "kaggle_test/08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e": {
+      "psnr": 30.98300552368164,
+      "ssim": 0.9895142167806625,
+      "text_psnr": 24.452813148498535,
+      "n": 4
+    },
+    "kaggle_test/1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874": {
+      "psnr": 29.577889442443848,
+      "ssim": 0.9873695075511932,
+      "text_psnr": 23.824660778045654,
+      "n": 4
+    },
+    "kaggle_test/2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36": {
+      "psnr": 29.74806833267212,
+      "ssim": 0.985962525010109,
+      "text_psnr": 24.783657550811768,
+      "n": 4
+    },
+    "kaggle_test/46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6": {
+      "psnr": 33.309115409851074,
+      "ssim": 0.9948301613330841,
+      "text_psnr": 26.978694915771484,
+      "n": 4
+    },
+    "kaggle_test/4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8": {
+      "psnr": 31.84517192840576,
+      "ssim": 0.9925394803285599,
+      "text_psnr": 25.336899757385254,
+      "n": 4
+    },
+    "kaggle_test/f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655": {
+      "psnr": 31.682457447052002,
+      "ssim": 0.9925512224435806,
+      "text_psnr": 25.80129861831665,
+      "n": 4
+    },
+    "augraphy_shift": {
+      "psnr": 17.164148052533466,
+      "ssim": 0.8449672783414522,
+      "text_psnr": 10.727262536684671,
+      "n": 24
+    },
+    "augraphy_shift/08bdc697cd1769263ccb9e5f90244c5d44d27bf0c40e89f5a78ad21e6410856e": {
+      "psnr": 17.941580295562744,
+      "ssim": 0.8582901954650879,
+      "text_psnr": 10.719950914382935,
+      "n": 4
+    },
+    "augraphy_shift/1aa1e53ccdcc8c3e4dccb5aa71ab060902a100d78bf371238808432c0a3c7874": {
+      "psnr": 17.15822744369507,
+      "ssim": 0.8229866623878479,
+      "text_psnr": 10.598979949951172,
+      "n": 4
+    },
+    "augraphy_shift/2e773906ff65177135c67b8857d62aa300cd25c9968f42f3c238b8527cd6ed36": {
+      "psnr": 18.18989086151123,
+      "ssim": 0.8488598316907883,
+      "text_psnr": 12.136845827102661,
+      "n": 4
+    },
+    "augraphy_shift/46b6a4127dce8abaa27adc4b64684e9598d7107bdbb1bd193fd940b3a03862b6": {
+      "psnr": 16.18144679069519,
+      "ssim": 0.8476964980363846,
+      "text_psnr": 9.587719440460205,
+      "n": 4
+    },
+    "augraphy_shift/4c10057aa9e1e9d63d40bab2e87d7a50a765bb6d977fc4f2936269c7b8f71bb8": {
+      "psnr": 16.495331287384033,
+      "ssim": 0.8396827876567841,
+      "text_psnr": 10.451377868652344,
+      "n": 4
+    },
+    "augraphy_shift/f5c9aa8d6568da92bf6a07f837038b9f5b533de286c4482d6a35616b1bdeb655": {
+      "psnr": 17.01841163635254,
+      "ssim": 0.852287694811821,
+      "text_psnr": 10.868701219558716,
+      "n": 4
+    },
+    "dibco2017": {
+      "fm": 66.52972606892999,
+      "pfm": 75.54569641275718,
+      "psnr": 13.02204737527615,
+      "drd": 11.770146775852384,
+      "n": 20
+    },
+    "dibco2017/handwritten": {
+      "fm": 62.99992918699767,
+      "pfm": 72.81618644956359,
+      "psnr": 12.616761941183984,
+      "drd": 11.509284105144486,
+      "n": 10
+    },
+    "dibco2017/printed": {
+      "fm": 70.05952295086236,
+      "pfm": 78.27520637595082,
+      "psnr": 13.42733280936832,
+      "drd": 12.031009446560278,
+      "n": 10
+    }
+  }
+}

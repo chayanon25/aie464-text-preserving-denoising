@@ -77,6 +77,9 @@
 !/mini_project/outputs/final/
 /mini_project/outputs/final/*
 !/mini_project/outputs/final/dibco_split.json
+# Final Colab results (per-image eval JSON, latency, summary) back the report tables.
+!/mini_project/outputs/final/colab/
+/mini_project/outputs/final/colab/**/*.pt
 
 # Datasets and archives belong in local storage / Google Drive.
 **/data/
