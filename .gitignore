@@ -139,3 +139,4 @@ htmlcov/
 *.tmp
 .DS_Store
 Thumbs.db
+augraphy_cache/
