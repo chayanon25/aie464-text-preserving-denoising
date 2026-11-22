@@ -96,6 +96,9 @@ def load_trained(ref, runs_root=None, device='cpu'):
     if str(ref).startswith('midterm:'):
         from .eval_suite import load_midterm
         return load_midterm(str(ref).split(':', 1)[1]).to(device).eval()
+    if str(ref) == 'nafnet:sidd':
+        from .models.nafnet import load_nafnet_sidd
+        return load_nafnet_sidd().to(device).eval()
     ckpt = torch.load(_resolve_checkpoint(ref, runs_root), map_location='cpu', weights_only=False)
     cfg = ckpt.get('config', {})
     model = build_model(cfg['model'])

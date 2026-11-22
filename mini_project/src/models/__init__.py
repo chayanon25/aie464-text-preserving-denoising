@@ -1,5 +1,6 @@
 """Model registry shared by training, evaluation and the Colab notebook."""
 from .dncnn import DnCNNLite
+from .nafnet import GrayNAFNet
 from .shallow_cnn import ShallowCNN
 from .unet import SmallUNet
 
@@ -22,4 +23,6 @@ def build_model(name: str):
         return DnCNNLite(width=32, depth=7, norm=None)
     if name == 'unet':
         return SmallUNet(width=16)
+    if name == 'nafnet':
+        return GrayNAFNet()   # random init; see nafnet.load_nafnet_sidd for weights
     raise ValueError(f'Unknown model: {name!r}')
