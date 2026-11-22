@@ -1,0 +1,11 @@
+# Local development and test dependencies (CPU). Colab already ships torch.
+torch
+numpy
+pillow
+scikit-image
+scipy
+augraphy
+pytest
+nbformat
+nbclient
+ipykernel
