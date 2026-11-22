@@ -100,3 +100,70 @@ def make_loader(dataset, shuffle=False, seed=42):
     """Batch 1 preserves variable page dimensions; CPU only, notebook safe."""
     return DataLoader(dataset, batch_size=1, shuffle=shuffle, num_workers=0,
                       pin_memory=False, generator=torch.Generator().manual_seed(seed))
+
+
+def _load_gray_array(path):
+    with Image.open(path) as image:
+        return np.array(image.convert('L'), dtype=np.float32) / 255.0
+
+
+def load_kaggle_split(root, manifest, split):
+    """Load one split of the frozen Kaggle manifest as numpy samples.
+
+    Each sample: dict(id, noisy[H,W] float32, clean[H,W] float32, group).
+    """
+    root, manifest = Path(root), json.loads(Path(manifest).read_text())
+    noisy_dir, clean_dir = root / 'train', root / 'train_cleaned'
+    available = set(paired_ids(noisy_dir, clean_dir))
+    group_of = {page: group for group, pages in manifest['groups'].items() for page in pages}
+    ids = manifest['splits'][split]
+    missing = sorted(set(ids) - available)
+    if missing:
+        raise ValueError(f'Manifest pages missing from {root}: {missing[:5]}')
+    samples = []
+    for page_id in ids:
+        noisy, clean = _load_gray_array(noisy_dir / page_id), _load_gray_array(clean_dir / page_id)
+        if noisy.shape != clean.shape:
+            raise ValueError(f'Dimension mismatch for {page_id}')
+        samples.append({'id': page_id, 'noisy': noisy, 'clean': clean, 'group': group_of[page_id]})
+    return samples
+
+
+class RandomPatchDataset(Dataset):
+    """Random square patches from numpy samples; deterministic per (seed, epoch, index).
+
+    Pages smaller than the patch are padded with white (1.0) on both images.
+    `augment(noisy, clean, rng) -> (noisy, clean)` runs after cropping.
+    """
+
+    def __init__(self, samples, patch_size=256, samples_per_epoch=1000, augment=None, seed=42):
+        if not samples:
+            raise ValueError('RandomPatchDataset needs at least one sample')
+        self.samples, self.patch_size = list(samples), int(patch_size)
+        self.samples_per_epoch, self.augment, self.seed = int(samples_per_epoch), augment, int(seed)
+        self.epoch = 0
+
+    def set_epoch(self, epoch):
+        self.epoch = int(epoch)
+
+    def __len__(self):
+        return self.samples_per_epoch
+
+    def __getitem__(self, index):
+        rng = np.random.default_rng([self.seed, self.epoch, int(index)])
+        sample = self.samples[int(rng.integers(len(self.samples)))]
+        p = self.patch_size
+        noisy, clean = sample['noisy'], sample['clean']
+        height, width = noisy.shape
+        pad = ((0, max(0, p - height)), (0, max(0, p - width)))
+        if pad[0][1] or pad[1][1]:
+            noisy = np.pad(noisy, pad, constant_values=1.0)
+            clean = np.pad(clean, pad, constant_values=1.0)
+            height, width = noisy.shape
+        top, left = int(rng.integers(height - p + 1)), int(rng.integers(width - p + 1))
+        noisy = noisy[top:top + p, left:left + p]
+        clean = clean[top:top + p, left:left + p]
+        if self.augment is not None:
+            noisy, clean = self.augment(noisy, clean, rng)
+        return (torch.from_numpy(np.ascontiguousarray(noisy, dtype=np.float32))[None],
+                torch.from_numpy(np.ascontiguousarray(clean, dtype=np.float32))[None])

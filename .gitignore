@@ -71,6 +71,9 @@
 !/mini_project/outputs/phase1/
 /mini_project/outputs/phase1/*
 !/mini_project/outputs/phase1/split_manifest.json
+!/mini_project/outputs/final/
+/mini_project/outputs/final/*
+!/mini_project/outputs/final/dibco_split.json
 
 # Datasets and archives belong in local storage / Google Drive.
 **/data/
