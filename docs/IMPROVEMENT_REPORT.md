@@ -193,11 +193,22 @@ LoRA แบบ r4 เพิ่มพารามิเตอร์ 31,652 ตั
 
 ![qual kaggle](figures/qual_kaggle_test.png)
 ![zoom kaggle](figures/zoom_kaggle_test.png)
+
+*Kaggle test: ทุกโมเดลลบคราบพื้นหลังได้ใกล้เคียงกัน `nafnet_ft` ให้ตัวอักษรหนาและเข้มกว่า ground truth*
+
 ![qual shift](figures/qual_augraphy_shift.png)
 ![zoom shift](figures/zoom_augraphy_shift.png)
+
+*Augraphy shift: midterm U-Net ทำตัวอักษรขาดและจาง ส่วน `unet_edge_aug` คงเส้นตัวอักษรได้คมใกล้ ground truth (สอดคล้องกับ 14.53 → 17.48 dB)*
+
 ![qual dibco](figures/qual_dibco2017.png)
 ![zoom dibco](figures/zoom_dibco2017.png)
+
+*DIBCO 2017: ถ้าไม่ fine-tune หมึกจางจะถูกลบทิ้ง `ft_full` กู้ตัวอักษรกลับมาได้ ส่วน `nafnet_ft_dibco_full` แม้ FM เฉลี่ยสูงสุด แต่ในภาพนี้ตัวอักษรบางช่วงขาดหาย ค่าเฉลี่ยที่สูงกว่าจึงไม่ได้แปลว่าดีกว่าทุกภาพ*
+
 ![curves](figures/curves.png)
+
+*Validation PSNR ระหว่างเทรน: ซ้ายคือ Kaggle (30 epochs; `nafnet_ft` 20 epochs) ขวาคือ fine-tune บน DIBCO*
 
 ## 8. ข้อสรุปที่มีตัวเลขรองรับ
 
@@ -230,7 +241,7 @@ LoRA แบบ r4 เพิ่มพารามิเตอร์ 31,652 ตั
 ## 9. Limitations
 
 - **"โค้ดรันได้" ไม่เท่ากับ "โมเดลดี":**
-  - ด้านโค้ด: pipeline ทั้งหมดรันครบบน T4 คือ 16 jobs, eval 25 รายการ และ test 105 ตัวผ่าน
+  - ด้านโค้ด: pipeline ทั้งหมดรันครบบน T4 คือ 16 jobs, eval 25 รายการ และ unit test 107 ตัวผ่านบนเครื่อง dev
   - ด้านคุณภาพ: ข้อสรุปเรื่องคุณภาพโมเดลยึดตามตัวเลขในหัวข้อ 6 และ 8 เท่านั้น
 - **Seed:**
   - มีหลาย seed เฉพาะ `unet_edge_aug` (3 seeds) โมเดลอื่นใช้ seed เดียว
