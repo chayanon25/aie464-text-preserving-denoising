@@ -48,7 +48,9 @@ class JobRegistry:
         for job_id, entry in data.items():
             stale = (entry['status'] == 'running' and entry['heartbeat'] is not None
                      and now() - entry['heartbeat'] > STALE_MINUTES * 60)
-            if entry['status'] == 'pending' or stale:
+            # A reconnecting account resumes its own unfinished job first-come, like a stale one.
+            mine = entry['status'] == 'running' and entry.get('owner') == owner
+            if entry['status'] == 'pending' or stale or mine:
                 entry.update(status='running', owner=owner, heartbeat=now())
                 self._write(data)
                 # Best-effort race check: re-read and confirm we still own it.

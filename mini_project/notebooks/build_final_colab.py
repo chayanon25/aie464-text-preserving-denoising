@@ -19,7 +19,7 @@ GIT_SHA = 'main'          # set to the exact commit sha before running jobs
 JOB_ID = None             # None = claim the next pending job from runs/jobs.json
 OWNER = 'account-1'       # a label for this Colab account
 SMOKE = {smoke!r}            # True = tiny synthetic CPU run, no Drive
-MAX_MINUTES = 150         # pause safely before Colab kills the session
+MAX_MINUTES = 330         # pause safely before Colab kills the session (rerun to resume)
 LOCAL_REPO = {str(local_repo) if local_repo else None!r}
 
 # Training budget per job: (epochs, samples_per_epoch). Filled in after the pilot
@@ -139,24 +139,24 @@ for job_id in (['pilot_unet_edge_aug'] if SMOKE else BUDGETS):
 print(REGISTRY.summary())
 '''
 
-RUN = '''# 6. Claim and run a job; checkpoint + heartbeat every epoch, pause before MAX_MINUTES
+RUN = '''# 6. Run jobs back to back: JOB_ID set = that job only, None = every pending job in BUDGETS order.
+# Checkpoint + heartbeat every epoch; pauses before MAX_MINUTES. If Colab drops, rerun cells 1-6 to resume.
 import time
 from src.train_engine import run_job
-if JOB_ID:
-    cfg = budgeted(JOB_ID)
-    REGISTRY.add(cfg)
-    REGISTRY.mark(JOB_ID, 'running', owner=OWNER)
-else:
-    cfg = REGISTRY.claim_next(OWNER)
-if cfg is None:
-    print('No pending job.')
-else:
-    started, result = time.time(), None
-    data = get_job_data(cfg)
-    while True:
-        left = MAX_MINUTES - (time.time() - started) / 60
-        if left <= 0:
-            break
+started = time.time()
+while True:
+    if JOB_ID:
+        cfg = budgeted(JOB_ID)
+        REGISTRY.add(cfg)
+        if REGISTRY.status(JOB_ID) == 'done':
+            print(JOB_ID, 'already done'); break
+        REGISTRY.mark(JOB_ID, 'running', owner=OWNER)
+    else:
+        cfg = REGISTRY.claim_next(OWNER)
+    if cfg is None:
+        print('No pending job: all done.'); break
+    data, result = get_job_data(cfg), None
+    while (left := MAX_MINUTES - (time.time() - started) / 60) > 0:
         result = run_job(cfg, RUNS_ROOT / cfg.job_id, data, DEVICE, max_minutes=left, max_epochs=1,
                          runs_root=RUNS_ROOT, on_progress=lambda: REGISTRY.heartbeat(cfg.job_id, owner=OWNER))
         REGISTRY.heartbeat(cfg.job_id, owner=OWNER)
@@ -165,7 +165,10 @@ else:
         if result['status'] == 'done':
             REGISTRY.mark(cfg.job_id, 'done', owner=OWNER)
             break
-    print('finished call with status:', result and result['status'])
+    if JOB_ID or not (result and result['status'] == 'done'):
+        print('stopped at', cfg.job_id, 'status:', result and result['status'],
+              '(time budget reached: rerun cells 1-6 to continue)' if left <= 0 else ''); break
+print(REGISTRY.summary())
 '''
 
 EVALUATE = '''# 7. Evaluate every finished run (plus midterm and classical baselines) on all test sets

@@ -41,3 +41,8 @@ def test_registry_rejects_foreign_owner(tmp_path):
         r.mark('t', 'done', owner='acc2')
     r.mark('t', 'done', owner='acc1')
     assert r.status('t') == 'done'
+
+
+def test_registry_owner_resumes_own_running_job(tmp_path):
+    r = JobRegistry(tmp_path / 'jobs.json'); r.add(tiny_cfg()); r.claim_next('acc1')
+    assert r.claim_next('acc1').job_id == 't'
