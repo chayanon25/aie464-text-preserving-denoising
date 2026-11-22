@@ -135,9 +135,10 @@ def _rng_state():
 def _set_rng_state(state):
     random.setstate(state['python'])
     np.random.set_state(state['numpy'])
-    torch.set_rng_state(state['torch'])
+    # Checkpoints load with map_location=device, so the RNG tensors may sit on the GPU.
+    torch.set_rng_state(state['torch'].cpu().to(torch.uint8))
     if 'cuda' in state and torch.cuda.is_available():
-        torch.cuda.set_rng_state_all(state['cuda'])
+        torch.cuda.set_rng_state_all([s.cpu().to(torch.uint8) for s in state['cuda']])
 
 
 def _seed_everything(seed):

@@ -76,3 +76,12 @@ def test_progress_callback_called_within_epoch(tmp_path, tiny_data):
     calls = []
     run_job(tiny_cfg(), tmp_path, tiny_data, 'cpu', on_progress=lambda: calls.append(1), progress_every=1)
     assert len(calls) >= 4   # 2 steps/epoch x 2 epochs
+
+
+def test_set_rng_state_accepts_tensor_not_on_cpu_bytes():
+    # torch.load(map_location='cuda') moves the RNG ByteTensors to the GPU; restoring must cope.
+    import torch
+    from src import train_engine
+    state = train_engine._rng_state()
+    state['torch'] = state['torch'].to(torch.float32)  # stand-in for a non-CPU-ByteTensor copy
+    train_engine._set_rng_state(state)
