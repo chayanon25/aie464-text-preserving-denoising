@@ -19,8 +19,9 @@ def test_notebook_is_generated_and_current():
 def test_pack_bundle_entries_cover_inputs():
     sys.path.insert(0, str(MINI_PROJECT / 'tools'))
     from pack_drive_bundle import bundle_entries
-    if not (MINI_PROJECT / 'data' / 'raw' / 'train').is_dir():
-        pytest.skip('local data not available')
+    # The packer runs on the dev machine only; Colab has the unzipped bundle, not the sources.
+    if not (MINI_PROJECT / 'data' / 'raw' / 'train').is_dir() or not (MINI_PROJECT / 'backups').is_dir():
+        pytest.skip('local bundle sources not available')
     arcs = [arc for _, arc in bundle_entries()]
     assert any(a.startswith('external/dibco/dibco2017/') for a in arcs)
     assert not any(a.endswith('.dat') for a in arcs)

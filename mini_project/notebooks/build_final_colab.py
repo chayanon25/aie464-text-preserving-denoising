@@ -81,7 +81,9 @@ else:
         link.parent.mkdir(exist_ok=True)
         if not link.exists():
             link.symlink_to(DATA_ROOT / sub)
-    subprocess.run([sys.executable, '-m', 'pytest', '-q', '-x', '-m', 'not slow'], cwd=MINI, check=True)
+    _t = subprocess.run([sys.executable, '-m', 'pytest', '-q', '-x', '-m', 'not slow'], cwd=MINI, capture_output=True, text=True)
+    print(_t.stdout[-4000:], _t.stderr[-2000:])
+    assert _t.returncode == 0, 'fast test suite failed (see output above)'
 
 def get_job_data(cfg):
     if SMOKE:
