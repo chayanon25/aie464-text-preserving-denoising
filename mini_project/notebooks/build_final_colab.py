@@ -253,5 +253,8 @@ def build_notebook(smoke=False, local_repo=None):
 
 
 if __name__ == '__main__':
+    # final_colab.ipynb now holds the real Colab outputs plus explanations; never overwrite it.
+    if NB_PATH.exists() and any(c.get('outputs') for c in nbformat.read(NB_PATH, as_version=4).cells):
+        raise SystemExit(f'{NB_PATH.name} has real Colab outputs; refusing to overwrite it.')
     nbformat.write(build_notebook(), NB_PATH)
     print('wrote', NB_PATH)

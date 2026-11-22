@@ -11,9 +11,16 @@ sys.path.insert(0, str(MINI_PROJECT / 'notebooks'))
 from build_final_colab import NB_PATH, build_notebook  # noqa: E402
 
 
-def test_notebook_is_generated_and_current():
+def test_submission_notebook_keeps_runner_code_and_outputs():
+    # final_colab.ipynb is the executed Colab run plus explanations (tools/annotate_colab_notebook.py):
+    # its runner code cells must match the builder except the pinned GIT_SHA, and keep their outputs.
     nb = nbformat.read(NB_PATH, as_version=4)
-    assert nb == build_notebook()
+    runner = [c for c in nb.cells if c.cell_type == 'code'][:10]
+    built = [c for c in build_notebook().cells if c.cell_type == 'code']
+    strip = lambda s: '\n'.join(l for l in s.splitlines() if not l.startswith('GIT_SHA'))  # noqa: E731
+    assert [strip(c.source) for c in runner] == [strip(c.source) for c in built]
+    assert "GIT_SHA = '75664d9" in runner[0].source
+    assert sum(bool(c.outputs) for c in runner) >= 7
 
 
 def test_pack_bundle_entries_cover_inputs():
