@@ -199,12 +199,12 @@ LoRA แบบ r4 เพิ่มพารามิเตอร์ 31,652 ตั
 ![qual shift](figures/qual_augraphy_shift.png)
 ![zoom shift](figures/zoom_augraphy_shift.png)
 
-*Augraphy shift: midterm U-Net ทำตัวอักษรขาดและจาง ส่วน `unet_edge_aug` คงเส้นตัวอักษรได้คมใกล้ ground truth (สอดคล้องกับ 14.53 → 17.48 dB)*
+*Augraphy shift: midterm U-Net ทำตัวอักษรขาดและจาง ส่วน `unet_edge_aug` คงเส้นตัวอักษรได้คมใกล้ ground truth (สอดคล้องกับ 14.53 → 17.48 dB) ทุกโมเดลยังคงบรรทัดที่บิดโค้งจาก Augraphy ไว้ เพราะงาน denoising ไม่ได้แก้รูปทรงเรขาคณิต ซึ่งเป็นเหตุผลหนึ่งที่ PSNR บนชุดนี้ยังต่ำกว่า Kaggle มาก*
 
 ![qual dibco](figures/qual_dibco2017.png)
 ![zoom dibco](figures/zoom_dibco2017.png)
 
-*DIBCO 2017: ถ้าไม่ fine-tune หมึกจางจะถูกลบทิ้ง `ft_full` กู้ตัวอักษรกลับมาได้ ส่วน `nafnet_ft_dibco_full` แม้ FM เฉลี่ยสูงสุด แต่ในภาพนี้ตัวอักษรบางช่วงขาดหาย ค่าเฉลี่ยที่สูงกว่าจึงไม่ได้แปลว่าดีกว่าทุกภาพ*
+*DIBCO 2017: ถ้าไม่ fine-tune หมึกจางจะถูกลบทิ้ง `ft_full` กู้ตัวอักษรกลับมาได้ ส่วน `nafnet_ft_dibco_full` แม้ FM เฉลี่ยสูงสุด แต่ในภาพนี้ตัวอักษรบางช่วงขาดหาย ค่าเฉลี่ยที่สูงกว่าจึงไม่ได้แปลว่าดีกว่าทุกภาพ ภาพขยายแสดงว่า `ft_full` ให้เส้นหนาและเป็นก้อน ส่วน `nafnet_ft_dibco_full` ให้เส้นบางและใกล้ ground truth กว่า*
 
 ![curves](figures/curves.png)
 
