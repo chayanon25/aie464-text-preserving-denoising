@@ -1,6 +1,8 @@
 """Turn the executed Colab runner into the submission notebook.
 
-    python3 tools/annotate_colab_notebook.py notebooks/final_colab_executed.ipynb notebooks/final_colab.ipynb
+    .venv/bin/python tools/annotate_colab_notebook.py notebooks/final_colab_executed.ipynb notebooks/final_colab.ipynb [--execute]
+
+--execute runs the report cells (11+) locally against outputs/final/ and stores their outputs.
 
 Keeps every code cell and its real Colab output untouched, replaces the title cell, puts a Thai
 explanation before each code cell and appends a report section (tables, figures, conclusions)
@@ -17,6 +19,17 @@ TITLE = r"""# AIE464 Final Project: Text-Preserving Image Denoising
 Notebook นี้คือไฟล์ที่ใช้เทรนและประเมินผลจริงทั้งหมด output ของ cell 1–10 เป็นผลจากการรันจริงบน Colab T4 (ไม่ได้แก้ไข) ส่วนหัวข้อ **"ผลลัพธ์และการเปรียบเทียบ"** ท้ายไฟล์สร้างตาราง กราฟ และภาพเปรียบเทียบจากผลเหล่านั้น
 
 > **วิธีรัน:** ห้ามกด Run all เพราะ cell 6 คือการเทรน 16 jobs (หลายชั่วโมง) ถ้าต้องการดูผลใหม่ ให้รันเฉพาะหัวข้อผลลัพธ์ (cell 11 เป็นต้นไป) ซึ่งตั้งค่าตัวเองได้โดยไม่ต้องรัน cell ก่อนหน้า
+
+### ผลสรุปย่อ (รายละเอียดในหัวข้อ 7–8)
+
+| คำถาม | ผล |
+|---|---|
+| Augmentation ช่วยไหม | In-domain ไม่ต่างอย่างมีนัยสำคัญ (32.15 vs 31.84 dB, p=0.375) แต่ทนต่อ domain shift ดีขึ้นชัด (Augraphy 17.48 vs 14.53 dB, p<0.001) |
+| Knowledge Distillation (W10) | CNN 7k params ดีขึ้น 28.84 vs 27.71 dB (p<0.001) ขนาดและความเร็วเท่าเดิม |
+| Fine-tune ข้าม dataset (W9) | DIBCO FM 61.9 → 84.4 (p<0.001) |
+| LoRA (W12) | FM 84.4 เท่า full fine-tune โดยเทรนแค่ราว 13% ของ params |
+| Pretrained NAFNet (W9) | ดีที่สุดบน DIBCO (FM 88.0) แต่บน Kaggle ไม่ดีกว่า U-Net ทั้งที่ใหญ่กว่า 60 เท่าและช้ากว่า 16 เท่า |
+| ข้อแลกเปลี่ยน | Fine-tune บน DIBCO ทำให้ผลบน Kaggle ตกเหลือ 20–23 dB (catastrophic forgetting) |
 
 ---
 
@@ -41,6 +54,7 @@ Notebook นี้คือไฟล์ที่ใช้เทรนและ�
 - **FM (F-measure):** พิกเซลหมึกที่ทำนายตรงกับ GT แค่ไหน ยิ่งสูงยิ่งดี
 - **pFM:** F-measure ที่ดูโครงเส้นตัวอักษร (skeleton)
 - **DRD:** ความผิดเพี้ยนที่สายตามนุษย์สังเกตได้ **ยิ่งต่ำยิ่งดี**
+- **การวัดบน DIBCO:** GT ของ DIBCO เป็นภาพขาวดำ ทุกโมเดลจึงถูก binarize ด้วย Otsu ก่อนวัดผล แถว "Otsu on raw input" คือการ binarize ภาพดิบโดยไม่ผ่านโมเดล ใช้เป็น baseline ว่าโมเดลช่วยได้จริงหรือไม่
 
 ไฟล์ข้อมูลทั้งหมดรวมไว้ใน `MyDrive/AIE464_runs/data/aie464_data.zip`
 
@@ -106,33 +120,52 @@ REPORT_INTRO = """---
 
 ## 7. ผลลัพธ์และการเปรียบเทียบ
 
-ส่วนนี้รันแยกได้ใน session ใหม่ (ไม่ต้องรัน cell 1–10) โดยอ่านผลประเมินที่ cell 7–8 บันทึกไว้บน Drive แล้วสร้างตาราง กราฟ และภาพเปรียบเทียบ โค้ดสร้างตารางอยู่ใน `src/report.py` และโค้ดสร้างรูปอยู่ใน `tools/make_figures.py`"""
+ส่วนนี้รันแยกได้ใน session ใหม่ (ไม่ต้องรัน cell 1–10) โดยอ่านผลประเมินรายภาพและ latency ที่ cell 7–8 บันทึกไว้ แล้วสร้างตาราง กราฟ และภาพเปรียบเทียบ โค้ดสร้างตารางอยู่ใน `src/report.py` และโค้ดสร้างรูปอยู่ใน `tools/make_figures.py`
+
+> **ที่มาของ output ในหัวข้อนี้:** รันบนเครื่องของผู้จัดทำ โดยใช้ไฟล์ที่ดาวน์โหลดจาก Drive หลังรัน cell 1–10 บน Colab (`best.pt`, `validation.json`, `eval/*.json`, `latency.json`) ตัวเลขในตารางคำนวณจากผลประเมินของ Colab โดยตรง ส่วนภาพเปรียบเทียบ denoise ใหม่ด้วย checkpoint เดียวกันบน CPU บน Colab cell 11 จะอ่านไฟล์ชุดเดียวกันจาก Drive แทน
+
+> **หมายเหตุ midterm:** `midterm_unet_edge` ได้ 31.84 dB ตรงกับ checkpoint และผล benchmark ของ midterm ที่เก็บไว้ ส่วนค่า 31.865 dB ที่เคยรายงานตอน midterm มาจากอีกรันหนึ่งที่ไม่มี checkpoint เหลืออยู่ จึงรายงานไว้ทั้งสองค่า"""
 
 SETUP = """# 11. Report setup: runs on its own in a fresh session (do NOT rerun cells 1-10)
+# On Colab: read the runs from Drive. Elsewhere: use the same files downloaded into mini_project/outputs/final/.
 import os, subprocess, sys, json
 from pathlib import Path
-from google.colab import drive
-drive.mount('/content/drive')
-DRIVE_ROOT = '/content/drive/MyDrive/AIE464_runs'
-REPO_URL = 'https://github.com/chayanon25/aie464-text-preserving-denoising.git'
-RUNS = Path(DRIVE_ROOT) / 'runs'
-REPO = Path('/content/report_repo')
-if not REPO.exists():
-    subprocess.run(['git', 'clone', '-q', REPO_URL, str(REPO)], check=True)
-MINI = REPO / 'mini_project'
+try:
+    from google.colab import drive
+    IN_COLAB = True
+except ImportError:
+    IN_COLAB = False
+if IN_COLAB:
+    drive.mount('/content/drive')
+    DRIVE_ROOT = '/content/drive/MyDrive/AIE464_runs'
+    REPO_URL = 'https://github.com/chayanon25/aie464-text-preserving-denoising.git'
+    RUNS = Path(DRIVE_ROOT) / 'runs'
+    EVAL_DIR, LATENCY_PATH = RUNS / 'eval', RUNS / 'latency.json'
+    REPO = Path('/content/report_repo')
+    if not REPO.exists():
+        subprocess.run(['git', 'clone', '-q', REPO_URL, str(REPO)], check=True)
+    MINI = REPO / 'mini_project'
+    FIG_DIR = Path('/content/figures')
+    subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'augraphy', 'scikit-image'], check=True)
+    DATA_ROOT = Path('/content/data')
+    if not (DATA_ROOT / 'raw').exists():
+        subprocess.run(['unzip', '-q', '-o', f'{DRIVE_ROOT}/data/aie464_data.zip', '-d', str(DATA_ROOT)], check=True)
+    os.environ['MIDTERM_CKPT_DIR'] = str(DATA_ROOT / 'checkpoints')
+    for sub in ('raw', 'external'):
+        link = MINI / 'data' / sub
+        link.parent.mkdir(exist_ok=True)
+        if not link.exists():
+            link.symlink_to(DATA_ROOT / sub)
+else:
+    MINI = Path.cwd().resolve().parent  # this notebook lives in mini_project/notebooks/
+    RUNS = MINI / 'outputs' / 'final' / 'runs'
+    EVAL_DIR = MINI / 'outputs' / 'final' / 'colab' / 'eval_zip' / 'eval'
+    LATENCY_PATH = MINI / 'outputs' / 'final' / 'colab' / 'latency.json'
+    FIG_DIR = MINI / 'outputs' / 'final' / 'notebook_figures'
 sys.path.insert(0, str(MINI))
-subprocess.run([sys.executable, '-m', 'pip', 'install', '-q', 'augraphy', 'scikit-image'], check=True)
-DATA_ROOT = Path('/content/data')
-if not (DATA_ROOT / 'raw').exists():
-    subprocess.run(['unzip', '-q', '-o', f'{DRIVE_ROOT}/data/aie464_data.zip', '-d', str(DATA_ROOT)], check=True)
-os.environ['MIDTERM_CKPT_DIR'] = str(DATA_ROOT / 'checkpoints')
-for sub in ('raw', 'external'):
-    link = MINI / 'data' / sub
-    link.parent.mkdir(exist_ok=True)
-    if not link.exists():
-        link.symlink_to(DATA_ROOT / sub)
-sha = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'], capture_output=True, text=True).stdout.strip()
-print('report code sha:', sha, '| eval files:', len(list((RUNS / 'eval').glob('*.json'))))"""
+sha = subprocess.run(['git', '-C', str(MINI), 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True).stdout.strip()
+print('environment:', 'Colab' if IN_COLAB else 'local copy of the Colab runs', '| report code:', sha)
+print('eval files:', len(list(EVAL_DIR.glob('*.json'))), '| trained runs:', len(list(RUNS.glob('*/best.pt'))))"""
 
 TABLES_MD = """### 7.1 ตารางผล
 ทุกตารางคำนวณจากผลรายภาพใน `runs/eval/*.json` ค่า p มาจาก paired Wilcoxon signed-rank test (two-sided) ซึ่งทดสอบว่าความต่างรายภาพระหว่าง 2 โมเดลมีนัยสำคัญหรือไม่"""
@@ -144,7 +177,7 @@ TITLES = {'in_domain': 'In-domain (Kaggle test, 24 ภาพ)', 'augraphy_shift'
           'dibco2017': 'Cross-dataset (DIBCO 2017, 20 ภาพ)', 'finetune': 'Fine-tune และการลืมงานเดิม (forgetting)',
           'efficiency': 'Efficiency (540x420, batch 1, Tesla T4, median 50 รอบ)',
           'wilcoxon': 'ทดสอบนัยสำคัญ (paired Wilcoxon)'}
-tables = build_tables(RUNS / 'eval', latency_path=RUNS / 'latency.json')
+tables = build_tables(EVAL_DIR, latency_path=LATENCY_PATH)
 for key, table in tables.items():
     display(Markdown(f'#### {TITLES.get(key, key)}\\n\\n{table}'))"""
 
@@ -153,10 +186,11 @@ FIGS_MD = """### 7.2 ภาพประกอบและภาพเปรี�
 
 FIGS = """# 13. Figures: data samples, Sobel, U-Net shapes, qualitative grids, zooms, training curves
 from IPython.display import Image
-FIG_DIR = Path('/content/figures')
 _r = subprocess.run([sys.executable, str(MINI / 'tools' / 'make_figures.py'), '--runs', str(RUNS), '--out', str(FIG_DIR)],
                     capture_output=True, text=True)
-print(_r.stdout[-2000:], _r.stderr[-2000:])
+if _r.returncode:
+    print(_r.stdout[-2000:], _r.stderr[-2000:])
+print('figures:', len(list(FIG_DIR.glob('*.png'))))
 CAPTIONS = [
     ('data_samples', 'ตัวอย่างข้อมูล: Kaggle, Augraphy shift และ DIBCO 2017'),
     ('sobel_explainer', 'Sobel: kernel Gx/Gy และ edge map ที่ใช้ใน edge loss'),
@@ -222,8 +256,23 @@ def annotate(nb):
     return nb
 
 
+def execute_report(nb, cwd):
+    """Run only the report cells (11+) in a fresh kernel and copy their outputs back."""
+    import nbformat
+    from nbclient import NotebookClient
+    report = [c for c in nb['cells'] if c['cell_type'] == 'code'][10:]
+    tmp = nbformat.v4.new_notebook(cells=[nbformat.v4.new_code_cell(''.join(c['source'])) for c in report])
+    NotebookClient(tmp, timeout=1800, kernel_name='python3', resources={'metadata': {'path': str(cwd)}}).execute()
+    for i, (cell, ran) in enumerate(zip(report, tmp.cells), start=11):
+        cell['outputs'] = [json.loads(json.dumps(o)) for o in ran.outputs]
+        cell['execution_count'] = i
+    return nb
+
+
 if __name__ == '__main__':
     src, dst = map(Path, sys.argv[1:3])
     nb = annotate(json.loads(src.read_text()))
+    if '--execute' in sys.argv:
+        nb = execute_report(nb, dst.resolve().parent)
     dst.write_text(json.dumps(nb, ensure_ascii=False, indent=1) + '\n')
     print('wrote', dst, len(nb['cells']), 'cells')
