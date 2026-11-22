@@ -35,6 +35,9 @@
 /mini_project/notebooks/*
 !/mini_project/notebooks/final_colab.ipynb
 !/mini_project/notebooks/build_final_colab.py
+!/mini_project/tools/
+/mini_project/tools/*
+!/mini_project/tools/*.py
 
 # Legacy notebooks stay local. Publish one immutable final notebook only.
 /mini_project/FINAL_SUBMISSION/*

@@ -4,6 +4,7 @@ Grayscale sets (kaggle_test, augraphy_shift): PSNR, SSIM, text-masked PSNR.
 Binary sets (dibco2017): DIBCO FM / pFM / PSNR / DRD after Otsu binarization.
 """
 import json
+import os
 from pathlib import Path
 
 import numpy as np
@@ -18,7 +19,8 @@ from .metrics_binary import dibco_metrics
 from .models import MIDTERM_EXPERIMENTS, build_model
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-MIDTERM_CKPT_DIR = PROJECT_ROOT / 'backups' / 'aie464_final_artifacts' / 'checkpoints'
+MIDTERM_CKPT_DIR = Path(os.environ.get(
+    'MIDTERM_CKPT_DIR', PROJECT_ROOT / 'backups' / 'aie464_final_artifacts' / 'checkpoints'))
 BINARY_TESTSETS = {'dibco2017'}
 
 
