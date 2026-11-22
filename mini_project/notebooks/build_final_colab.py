@@ -25,9 +25,26 @@ LOCAL_REPO = {str(local_repo) if local_repo else None!r}
 # Training budget per job: (epochs, samples_per_epoch). Filled in after the pilot
 # (plan Task 12); only jobs listed here are registered. Pilot budgets use equal
 # optimizer steps: 2000/8 (U-Net) == 1000/4 (NAFNet) == 250 steps.
+# Approved after the Task 12 pilot (UNet 16.7 s / 2000 samples, NAFNet 101 s / 1000 samples on T4).
+# Order matters: claim_next takes jobs top-down and does not check dependencies,
+# so parents (unet_edge_aug, nafnet_ft) come before the jobs that load them.
 BUDGETS = {{
     'pilot_unet_edge_aug': (1, 2000),
     'nafnet_short_ft': (1, 1000),
+    'unet_edge_aug': (30, 2000),
+    'nafnet_ft': (20, 1000),
+    'dncnn_nobn_aug': (30, 2000),
+    'unet_aug_l0': (30, 2000),
+    'unet_aug_l05': (30, 2000),
+    'unet_edge_aug_s43': (30, 2000),
+    'unet_edge_aug_s44': (30, 2000),
+    'kd_cnn': (30, 2000),
+    'ft_full': (20, 1000),
+    'ft_freeze_enc': (20, 1000),
+    'ft_lora4': (20, 1000),
+    'ft_lora8': (20, 1000),
+    'nafnet_ft_dibco_full': (10, 1000),
+    'nafnet_ft_dibco_lora8': (10, 1000),
 }}
 
 # "Run on any folder" (cell 9): leave INPUT_DIR = None to skip.
