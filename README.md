@@ -29,6 +29,10 @@ Final project ต่อยอดจากโมเดล midterm (SmallUNet + So
 
 แบ่ง train / val / test ตามหน้าเอกสารก่อนตัดเป็น patch เพื่อไม่ให้หน้าเดียวกันไปอยู่ทั้งชุดเทรนและชุดทดสอบ
 
+![ตัวอย่างภาพจากทั้ง 3 ชุด: แถวบนเป็น input แถวล่างเป็นภาพเฉลย](docs/figures/data_samples.png)
+
+*ซ้ายไปขวา: Kaggle, Augraphy shift, DIBCO 2017 แถวบนเป็นภาพ input แถวล่างเป็นภาพเฉลย*
+
 ## Metric
 
 - **PSNR (dB), SSIM:** เทียบ output กับภาพเฉลยทีละ pixel ยิ่งสูงยิ่งดี
@@ -40,7 +44,11 @@ Final project ต่อยอดจากโมเดล midterm (SmallUNet + So
 
 **โมเดลหลัก: SmallUNet** (487,009 params) มี encoder 3 ชั้น, skip connection และ residual output (โมเดลทำนาย noise แล้วเอาไปลบออกจาก input)
 
+![โครงสร้าง SmallUNet พร้อม shape ของแต่ละชั้น](docs/figures/unet_diagram.png)
+
 **Edge loss:** `L = L1(pred, gt) + λ · L1(Sobel(pred), Sobel(gt))` โดย Sobel หาขอบตัวอักษรในแนวนอนและแนวตั้ง ทดลอง λ = 0, 0.1 (ค่าหลัก) และ 0.5
+
+![ขั้นตอน Sobel: ภาพต้นฉบับ, kernel Gx และ Gy, ขอบแนวนอน และ edge magnitude](docs/figures/sobel_explainer.png)
 
 เทคนิคที่เพิ่มหลัง midterm:
 
@@ -68,6 +76,11 @@ Final project ต่อยอดจากโมเดล midterm (SmallUNet + So
 
 ตัวที่ดีที่สุดสูงกว่า midterm แต่**ไม่มีนัยสำคัญ** (p = 0.375) แปลว่าบน noise แบบเดิม โมเดลใหม่ไม่ได้ดีกว่า midterm อย่างชัดเจน
 
+![ผลบน Kaggle test เทียบทุกโมเดล](docs/figures/qual_kaggle_test.png)
+![ภาพขยายบริเวณตัวอักษรบน Kaggle test](docs/figures/zoom_kaggle_test.png)
+
+*ทุกโมเดลลบคราบพื้นหลังได้ใกล้เคียงกัน ส่วน `nafnet_ft` ให้ตัวอักษรหนาและเข้มกว่า ground truth*
+
 ### 2. Domain shift (Augraphy)
 
 | โมเดล | PSNR (dB) | Text PSNR (dB) |
@@ -78,6 +91,11 @@ Final project ต่อยอดจากโมเดล midterm (SmallUNet + So
 | U-Net edge + aug | **17.48** | **10.89** |
 
 Augmentation ทำให้ทนต่อ noise ที่ไม่เคยเห็นได้ชัดเจน (median +2.74 dB, p < 0.001) และผลนี้คงที่ทั้ง 3 seeds (17.41–17.48 dB) **นี่คือผลที่ชัดที่สุดของงาน**
+
+![ผลบน Augraphy shift เทียบทุกโมเดล](docs/figures/qual_augraphy_shift.png)
+![ภาพขยายบริเวณตัวอักษรบน Augraphy shift](docs/figures/zoom_augraphy_shift.png)
+
+*midterm U-Net ทำให้ตัวอักษรขาดและจาง ส่วน `unet_edge_aug` เก็บเส้นตัวอักษรได้คมใกล้ ground truth ทุกโมเดลยังเหลือบรรทัดที่บิดโค้งจาก Augraphy อยู่ เพราะงาน denoising ไม่ได้แก้รูปทรงเรขาคณิต*
 
 ### 3. Cross-dataset (DIBCO 2017)
 
@@ -95,9 +113,16 @@ Augmentation ทำให้ทนต่อ noise ที่ไม่เคยเ
 - LoRA r8 ได้ผลเท่า full fine-tune (p = 1.000) โดยเทรนเพิ่มแค่ 63,304 params
 - NAFNet ดีกว่า U-Net full fine-tune (+3.80 FM, p = 0.006)
 
+![ผลบน DIBCO 2017 เทียบก่อนและหลัง fine-tune](docs/figures/qual_dibco2017.png)
+![ภาพขยายบริเวณตัวอักษรบน DIBCO 2017](docs/figures/zoom_dibco2017.png)
+
+*ถ้าไม่ fine-tune หมึกจางจะถูกลบทิ้ง `ft_full` กู้ตัวอักษรกลับมาได้แต่เส้นหนาเป็นก้อน ส่วน `nafnet_ft_dibco_full` ได้เส้นบางใกล้ ground truth กว่า แต่ในภาพนี้ตัวอักษรบางช่วงขาด FM เฉลี่ยที่สูงกว่าจึงไม่ได้แปลว่าดีกว่าทุกภาพ*
+
 ### 4. Catastrophic forgetting
 
 หลัง fine-tune บน DIBCO PSNR บน Kaggle ตกจาก 31.19 dB เหลือ 20.03–22.98 dB ทุกวิธี LoRA ก็ไม่ได้ช่วยกันลืม เพราะตอนใช้งาน adapter ยังถูกบวกเข้ากับ weights ถ้าจะใช้งานจริงต้องเก็บโมเดลหรือ adapter แยกตาม domain
+
+![ซ้าย: FM บน DIBCO หลัง fine-tune ขวา: PSNR บน Kaggle ที่ลดลง](docs/figures/slide_forgetting.png)
 
 ### 5. Knowledge Distillation และความเร็ว
 
@@ -112,6 +137,8 @@ Augmentation ทำให้ทนต่อ noise ที่ไม่เคยเ
 
 - KD ทำให้ CNN เล็กดีขึ้น +1.15 dB (median, p < 0.001) โดยขนาดและความเร็วเท่าเดิม
 - NAFNet ได้ PSNR บน Kaggle เท่ากับ U-Net แต่ช้ากว่าราว 16 เท่า
+
+![เทียบ PSNR จำนวนพารามิเตอร์ และ latency](docs/figures/slide_kd_speed.png)
 
 ### Ablation: edge loss เทียบกับ seed
 
