@@ -1,149 +1,160 @@
 # AIE464 — Text-Preserving Image Denoising
 
-โปรเจกต์ลดสัญญาณรบกวนในภาพเอกสารด้วย PyTorch โดยศึกษาการรักษาขอบตัวอักษร เปรียบเทียบ Shallow CNN, DnCNN-lite และ Residual U-Net ที่ใช้ loss สองแบบ ภาพนำเข้าและผลลัพธ์มีขนาดเท่ากัน: `1 × H × W → 1 × H × W`
+โปรเจกต์ลด noise ในภาพเอกสารสแกนด้วย PyTorch โดยต้องเก็บขอบตัวอักษรให้คมอยู่ ภาพเข้าและภาพออกมีขนาดเท่ากัน (`1 × H × W → 1 × H × W`) งานนี้เป็น denoising ไม่ใช่ super-resolution
 
-**ผลชุดสุดท้าย:** `unet_edge` ได้ PSNR สูงสุด **31.865 dB** ส่วน `dncnn_lite` ได้ SSIM สูงสุด **0.9918** บน Test 24 คู่ภาพจาก 6 กลุ่มเอกสาร ยังไม่มีผล OCR ยืนยันว่าระบบอ่านข้อความได้ดีขึ้น
+Final project ต่อยอดจากโมเดล midterm (SmallUNet + Sobel edge loss) โดยมีโจทย์ 2 ข้อ:
 
-## ไฟล์สำหรับเปิดดูและทำสไลด์
+1. ทำให้โมเดลทนต่อ noise แบบใหม่ที่ไม่เคยเห็นตอนเทรน (domain shift)
+2. ทำให้โมเดลใช้กับ dataset อื่นได้ (cross-dataset)
 
-- [Improvement Report สำหรับเพื่อนทำสไลด์](docs/IMPROVEMENT_REPORT.md)
-- [Final Notebook พร้อม outputs การทดลองจริง](mini_project/FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb)
-- [Benchmark JSON — ตัวเลขเต็มก่อนปัดเศษ](mini_project/results/final/final_test_benchmark.json)
-- Artifacts ZIP ต้นฉบับและไฟล์ SHA256 ซึ่งเป็นรหัสตรวจความสมบูรณ์ของไฟล์ อยู่ในเครื่องที่ `mini_project/FINAL_SUBMISSION/aie464_final_artifacts.zip` และ `mini_project/FINAL_SUBMISSION/aie464_final_artifacts.zip.sha256`; ไม่รวมใน Repository อ่านรหัส SHA256 ได้ในส่วนท้ายของหน้านี้
+ทุกโมเดลวัดผลบน test set, metric และ GPU (Colab Tesla T4) ชุดเดียวกัน
 
-> ชุดนี้เตรียม Final Notebook, Presentation Brief และไฟล์ผลที่ตรวจแล้วสำหรับ GitHub โดยใช้ Relative Path ยังไม่ได้ Push; หลังอนุมัติและ Push แล้วจึงจะเห็นเวอร์ชันนี้บน GitHub ส่วน Dataset, ZIP และ checkpoints เก็บในเครื่อง
+## ไฟล์หลัก
 
-## Problem และ Objectives
-
-ภาพเอกสารที่มีคราบและสัญญาณรบกวนทำให้พื้นหลังไม่สม่ำเสมอและรายละเอียดตัวอักษรอ่านยาก การลดสัญญาณรบกวนจึงควรรักษาเส้นขอบตัวอักษรไปพร้อมกัน
-
-1. เปรียบเทียบโมเดลภายใต้ข้อมูลและงบฝึกเดียวกัน
-2. ศึกษาผลของ Sobel Edge Loss ซึ่งวัดความต่างของขอบภาพ เมื่อเพิ่มเข้าไปใน L1 Loss ซึ่งวัดความต่างของค่าพิกเซล
-3. ประเมินคุณภาพภาพ ความเร็ว และหน่วยความจำบนภาพเอกสารเต็มหน้า
-
-## Dataset
-
-Final Notebook แนบ Kaggle input `thames98451/aie464-denoising-benchmark` และอ่านคู่ภาพจาก `train/` กับ `train_cleaned/` พร้อม `split_manifest.json` ซึ่งกำหนดรายชื่อคู่ภาพในแต่ละชุด
-
-| Split | กลุ่มเอกสารต้นฉบับ | คู่ภาพ Noisy–Clean |
-|---|---:|---:|
-| Train | 25 | 100 |
-| Validation | 5 | 20 |
-| Test | 6 | 24 |
-| รวม | 36 | 144 |
-
-ตามคำอธิบายใน Final Notebook แต่ละกลุ่มมี 4 noisy variants แบ่งระดับกลุ่มเอกสารก่อน crop เพื่อป้องกัน Data Leakage หรือการที่ข้อมูลเอกสารเดียวกันหลุดไปอยู่ทั้งชุดฝึกและชุดทดสอบ ใช้ Seed 42 ซึ่งเป็นค่าเริ่มต้นของการสุ่ม และทุกโมเดลใช้ Test ชุดเดียวกัน **24 คู่ภาพไม่ได้หมายถึงเอกสารอิสระ 24 หน้า**
-
-ภาพแปลงเป็น Grayscale ช่องเดียวและปรับค่าพิกเซลเป็น `[0, 1]` ฝึกบน random crop 256×256 พิกเซล ส่วน Validation และ Test ประเมินเต็มหน้า
-
-## Models และ Methodology
-
-เปรียบเทียบ 4 configurations จากสถาปัตยกรรม 3 แบบ โดย U-Net สองรายการใช้โครงสร้างเดียวกันและต่างที่ loss:
-
-| Configuration | โครงสร้างใน Final Notebook | Parameters | Loss |
-|---|---|---:|---|
-| `cnn_l1` | Shallow CNN, 5 convolutions, width 16, Sigmoid output | 7,265 | L1 |
-| `dncnn_lite` | DnCNN-lite, 7 convolutions, width 32, BatchNorm | 47,009 | L1 |
-| `unet_l1` | Residual U-Net, 3 encoder levels, width 16, skip connections | 487,009 | L1 |
-| `unet_edge` | Residual U-Net โครงสร้างเดียวกับ `unet_l1` | 487,009 | L1 + 0.1 × Sobel Edge Loss |
-
-Residual Learning ในที่นี้คือให้โมเดลทำนาย noise แล้วลบออกจากภาพ: `denoised = noisy - predicted_noise` ใช้ใน DnCNN-lite และ U-Net ทั้งสอง ส่วน CNN ทำนายภาพสะอาดโดยตรง U-Net เติมขอบภาพก่อนประมวลผลและตัดกลับเป็นขนาดเดิม
-
-**Final Notebook ใช้ L1 + Sobel Edge Loss โดยไม่มี SSIM loss หรือ Attention เพิ่มเติม** SSIM ใช้เป็นตัวชี้วัดผลเท่านั้น
-
-### Final Notebook กับ Development Pipeline
-
-[Final Notebook](mini_project/FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb) เป็นโค้ดทดลองจริงที่มี outputs รองรับตารางผลในหน้านี้ และนิยามโมเดล การฝึก และการประเมินไว้ภายใน Notebook
-
-[`mini_project/src/`](mini_project/src/) เป็น **Development Pipeline** รุ่นพัฒนา มี Architecture ต่างจาก Final Notebook โดยเฉพาะ [`src/models/unet.py`](mini_project/src/models/unet.py) ที่ใช้ Sigmoid output ขณะที่ Final Notebook ใช้ residual output จึงไม่ควรใช้ `src/` แทน Final Notebook แล้วอ้างว่าจะได้ผล Benchmark ชุดนี้ งานจัดเอกสารรอบนี้ไม่ได้ปรับโค้ดสองชุดให้ตรงกัน
-
-อ่านขอบเขตของ source/scripts และเอกสารประวัติได้ที่ [Development Pipeline Guide](mini_project/README.md) Notebook รุ่น `02a`, `03`, `04`, `05` และไฟล์ทดลองอื่นเก็บไว้ในเครื่อง; GitHub แสดง Final Notebook เพียงฉบับเดียว
-
-## Experimental Setup
-
-| รายการ | การทดลองชุดสุดท้าย |
+| ไฟล์ | คืออะไร |
 |---|---|
-| Hardware ที่บันทึกใน output | Kaggle, Tesla T4 |
-| Precision | FP32 — เลขทศนิยม 32 บิต; ไม่ใช้ AMP ในการฝึกชุดนี้ |
-| Random seed | 42; reset ก่อนฝึกแต่ละ configuration |
-| Training budget | 20 Epochs ต่อ configuration; Epoch คือหนึ่งรอบผ่านข้อมูลฝึก |
-| Optimizer | Adam, learning rate `1e-3` |
-| Training batch / patch | 1 คู่ / 256×256 พิกเซล; noisy และ clean ใช้พิกัด crop เดียวกัน |
-| Gradient clipping | จำกัด gradient norm ที่ 1.0 |
-| Validation | ครบ 20 คู่เต็มหน้าทุก Epoch |
-| Checkpoint selection | เลือกน้ำหนักโมเดลจาก Validation PSNR สูงสุด |
-| Final Test | 24 คู่เต็มหน้าชุดเดียวกัน, batch size 1 |
+| [`mini_project/notebooks/final_colab.ipynb`](mini_project/notebooks/final_colab.ipynb) | **Notebook ที่ส่งอาจารย์** มีโค้ด คำอธิบาย output จริงจาก Colab ตารางผล และสรุป ([เปิดใน Colab](https://colab.research.google.com/github/chayanon25/aie464-text-preserving-denoising/blob/main/mini_project/notebooks/final_colab.ipynb)) |
+| [`docs/IMPROVEMENT_REPORT.md`](docs/IMPROVEMENT_REPORT.md) | รายงานผลฉบับเต็ม ตารางครบทุกโมเดล ค่า p และ limitations ตัวเลขทั้งหมดในหน้านี้มาจากไฟล์นี้ |
+| [`docs/figures/`](docs/figures/) | รูปที่ใช้ในรายงานและสไลด์ |
+| [`mini_project/src/`](mini_project/src/) | โค้ด pipeline (dataset, models, losses, train, evaluate, report) |
 
-## Results
+## ข้อมูล
 
-ที่มา: [Benchmark JSON](mini_project/results/final/final_test_benchmark.json) ที่คัดลอกตรงจาก Final ZIP ตารางปัด PSNR เป็น 3 ตำแหน่ง, SSIM เป็น 4 ตำแหน่ง, Latency เป็น 2 ตำแหน่ง และ VRAM เป็น 1 ตำแหน่ง
+| ชุด | ใช้ทำอะไร | จำนวน |
+|---|---|---|
+| Kaggle Denoising Dirty Documents | train / val / test (in-domain) | test 24 ภาพ จากเอกสารต้นฉบับ 6 หน้า |
+| Augraphy shift | test เท่านั้น: เอา Kaggle test มาใส่ noise แบบใหม่ (รอยหมึก เงา รอยพับ) ด้วย library Augraphy | 24 ภาพ |
+| DIBCO 2017 | test เท่านั้น (cross-dataset): เอกสารเก่าจริง ทั้งแบบพิมพ์และลายมือ | 20 ภาพ |
+| DIBCO 2018 + 2019A | fine-tune เท่านั้น ไม่ใช้ปี 2017 เพื่อกัน data leakage | train 16 / val 4 หน้า |
 
-| Configuration | Best Epoch | Test PSNR ↑ (dB) | Test SSIM ↑ | Latency ↓ (ms/page) | Peak VRAM ↓ (MB) |
-|---|---:|---:|---:|---:|---:|
-| `cnn_l1` | 20 | 27.706 | 0.9810 | 3.65 | 39.8 |
-| `dncnn_lite` | 13 | 31.669 | **0.9918** | 9.39 | 67.1 |
-| `unet_l1` | 18 | 31.506 | 0.9862 | 6.92 | 116.5 |
-| `unet_edge` | 18 | **31.865** | 0.9898 | 6.06 | 116.5 |
+แบ่ง train / val / test ตามหน้าเอกสารก่อนตัดเป็น patch เพื่อไม่ให้หน้าเดียวกันไปอยู่ทั้งชุดเทรนและชุดทดสอบ
 
-PSNR วัดความคลาดเคลื่อนพิกเซลในหน่วย dB และ SSIM วัดความคล้ายของโครงสร้างภาพ; ทั้งสองค่ายิ่งสูงยิ่งดี คำนวณต่อคู่แล้วเฉลี่ย 24 คู่ SSIM ใช้ Gaussian window 11×11, sigma 1.5 และ clamp ภาพเป็น `[0, 1]` ก่อนวัด
+## Metric
 
-เมื่อเทียบ U-Net โครงสร้างเดียวกัน `unet_edge` เพิ่ม PSNR **0.360 dB** และ SSIM **0.0036** จาก `unet_l1` ในชุดทดลองนี้ ส่วน `cnn_l1` ใช้เวลาต่อหน้าน้อยที่สุด ไม่มีโมเดลเดียวที่ดีที่สุดในทุกตัวชี้วัด
+- **PSNR (dB), SSIM:** เทียบ output กับภาพเฉลยทีละ pixel ยิ่งสูงยิ่งดี
+- **Text PSNR:** PSNR เฉพาะบริเวณตัวอักษร เพราะพื้นหลังสีขาวกินพื้นที่ส่วนใหญ่ของภาพ PSNR รวมจึงอาจสูงทั้งที่ตัวอักษรเสีย
+- **FM, pFM, DRD (DIBCO):** เฉลยของ DIBCO เป็นภาพขาวดำ จึงแปลง output เป็นขาวดำด้วย Otsu ก่อนวัด FM และ pFM ยิ่งสูงยิ่งดี ส่วน DRD ยิ่งต่ำยิ่งดี
+- **Wilcoxon signed-rank test:** เทียบสองโมเดลบนภาพเดียวกันทีละคู่ ถ้า p < 0.05 ถือว่าต่างกันอย่างมีนัยสำคัญ
 
-Latency จับเวลาหนึ่ง forward ต่อคู่ รวม output clamp และ CUDA synchronization แล้วเฉลี่ย ไม่รวมอ่านไฟล์ ส่งภาพเข้า GPU หรือคำนวณ metrics ไม่มี warm-up หรือการจับเวลาซ้ำหลายรอบต่อภาพ Peak VRAM มาจาก `torch.cuda.max_memory_allocated / 1024**2` ระหว่าง evaluation จึงเป็น MiB ตามสูตรแม้ต้นฉบับใช้ชื่อ MB และไม่ใช่ค่าหน่วยความจำช่วง Training
+## วิธีการ
 
-Validation logs: [CNN](mini_project/results/final/logs/cnn_l1/validation.json), [DnCNN-lite](mini_project/results/final/logs/dncnn_lite/validation.json), [U-Net L1](mini_project/results/final/logs/unet_l1/validation.json), [U-Net Edge](mini_project/results/final/logs/unet_edge/validation.json)
+**โมเดลหลัก: SmallUNet** (487,009 params) มี encoder 3 ชั้น, skip connection และ residual output (โมเดลทำนาย noise แล้วเอาไปลบออกจาก input)
 
-## Visual Evidence
+**Edge loss:** `L = L1(pred, gt) + λ · L1(Sobel(pred), Sobel(gt))` โดย Sobel หาขอบตัวอักษรในแนวนอนและแนวตั้ง ทดลอง λ = 0, 0.1 (ค่าหลัก) และ 0.5
 
-### ภาพเปรียบเทียบเต็มหน้า
+เทคนิคที่เพิ่มหลัง midterm:
 
-![ภาพเปรียบเทียบเต็มหน้าของ 4 คู่ภาพ Test](mini_project/results/final/qualitative_test_comparisons.png)
+| สัปดาห์ | เทคนิค | ทำอะไร |
+|---|---|---|
+| ทุก job | Augmentation | สุ่มเติม noise หลายแบบลงภาพเทรน (photometric, blur, JPEG, noise) |
+| W9 | Pretrained NAFNet | โมเดลใหญ่ (29M params) ที่ pretrain บน SIDD มาแล้ว นำมา fine-tune บน Kaggle |
+| W9 | Fine-tune ข้าม dataset | Kaggle → DIBCO แบบ full และแบบ freeze encoder |
+| W10 | Knowledge Distillation | ให้ CNN เล็ก (7,265 params) เรียนจาก output ของ U-Net |
+| W12 | LoRA | แช่ weights เดิมไว้ แล้วเทรนแค่ adapter เล็ก ๆ (rank 4 / 8) |
 
-แสดง 4 คู่ภาพ Test ตัวอย่าง เรียงคอลัมน์เป็น Input Noisy → CNN → DnCNN → U-Net L1 → U-Net Edge → Clean Ground Truth หรือภาพสะอาดอ้างอิง ไม่ใช่ภาพเปรียบเทียบครบทั้ง 24 คู่
+ทุก job ใช้ seed 42 มี `unet_edge_aug` ตัวเดียวที่รันเพิ่มด้วย seed 43 และ 44
 
-### ภาพขยายบริเวณตัวอักษร
+## ผลการทดลอง
 
-![ภาพขยาย 120×120 พิกเซลจากคู่ภาพเดียวกัน](mini_project/results/final/qualitative_zoom_comparisons.png)
+### 1. In-domain (Kaggle test)
 
-Crop 120×120 พิกเซลจากคู่ภาพตัวอย่างแรก ใช้ตำแหน่งเดียวกันทุกโมเดล เหมาะสำหรับอภิปรายพื้นหลังและเส้นตัวอักษร แต่ภาพตัวอย่างไม่แทนการวัดความถูกต้องของ OCR
+| โมเดล | PSNR (dB) |
+|---|---|
+| noisy input | 16.30 |
+| midterm U-Net edge | 31.84 |
+| U-Net edge + aug (λ = 0.1) | 31.19 |
+| U-Net aug, λ = 0.5 | **32.15** |
+| NAFNet fine-tuned | 31.19 |
 
-### กราฟการฝึกและ Validation
+ตัวที่ดีที่สุดสูงกว่า midterm แต่**ไม่มีนัยสำคัญ** (p = 0.375) แปลว่าบน noise แบบเดิม โมเดลใหม่ไม่ได้ดีกว่า midterm อย่างชัดเจน
 
-![Training Loss และ Validation PSNR/SSIM ตลอด 20 Epochs](mini_project/results/final/training_validation_curves.png)
+### 2. Domain shift (Augraphy)
 
-กราฟแสดง Training Loss, Validation PSNR และ Validation SSIM ไม่ใช่ Test ราย Epoch; loss ของ `unet_edge` มีองค์ประกอบเพิ่ม จึงไม่เปรียบเทียบระดับ loss ข้ามสูตรเพื่อจัดอันดับคุณภาพโดยตรง
+| โมเดล | PSNR (dB) | Text PSNR (dB) |
+|---|---|---|
+| noisy input | 9.93 | 9.09 |
+| midterm U-Net edge | 14.53 | 5.93 |
+| NAFNet fine-tuned | 17.16 | 10.73 |
+| U-Net edge + aug | **17.48** | **10.89** |
 
-## วิธีเปิดดูและเตรียมรันซ้ำ
+Augmentation ทำให้ทนต่อ noise ที่ไม่เคยเห็นได้ชัดเจน (median +2.74 dB, p < 0.001) และผลนี้คงที่ทั้ง 3 seeds (17.41–17.48 dB) **นี่คือผลที่ชัดที่สุดของงาน**
 
-สำหรับทำสไลด์ ใช้ [Improvement Report](docs/IMPROVEMENT_REPORT.md), JSON และภาพข้างต้น เปิดดู saved outputs ใน Final Notebook ได้โดยไม่ต้อง Run All
+### 3. Cross-dataset (DIBCO 2017)
 
-หากได้รับอนุมัติให้รันซ้ำในภายหลัง:
+| โมเดล | FM | DRD |
+|---|---|---|
+| Otsu บนภาพดิบ | 78.04 | 14.90 |
+| U-Net edge + aug (ยังไม่ fine-tune) | 61.91 | 12.23 |
+| U-Net fine-tune, freeze encoder | 77.53 | 6.94 |
+| U-Net fine-tune, full | 84.36 | 6.64 |
+| U-Net fine-tune, LoRA r8 | 84.38 | 6.86 |
+| NAFNet fine-tune, full | **87.98** | **5.05** |
 
-1. นำสำเนา Final Notebook เข้า Kaggle และตั้ง GPU Tesla T4
-2. แนบ input `thames98451/aie464-denoising-benchmark` ที่มีคู่ภาพและ `split_manifest.json` ตามโครงสร้างที่ Notebook ค้นหา
-3. Environment ต้องมี PyTorch, NumPy, Pillow, Matplotlib และ IPython ตาม imports; ชุดหลักฐานไม่ได้บันทึกเวอร์ชันครบทุกไลบรารี
-4. ตรวจ path discovery ใน CELL 1; output เดิมพบข้อมูลที่ `/kaggle/input/datasets/thames98451/aie464-denoising-benchmark/mini_project/data/raw` และ manifest ภายใต้ `mini_project/outputs/phase1/` ของ input เดียวกัน
-5. Run All จะฝึก 4 configurations ใหม่ครบ 20 Epochs แล้วประเมิน Test และ export ZIP; **ไม่ใช่โหมดแสดงผลอย่างเดียว** ใช้พื้นที่ผลลัพธ์แยกจากหลักฐานชุดสุดท้าย เพราะโค้ดเขียนผลและสร้าง ZIP ชื่อเดิม
+- ถ้ายังไม่ fine-tune U-Net แพ้ Otsu เพราะโมเดลที่เรียนจาก Kaggle ลบหมึกจาง ๆ ของเอกสารเก่าทิ้งไปด้วย
+- fine-tune ด้วยข้อมูลแค่ 16 ภาพ FM ขึ้นจาก 61.9 เป็น 84.4 (p < 0.001)
+- LoRA r8 ได้ผลเท่า full fine-tune (p = 1.000) โดยเทรนเพิ่มแค่ 63,304 params
+- NAFNet ดีกว่า U-Net full fine-tune (+3.80 FM, p = 0.006)
 
-งานจัดเอกสารนี้ไม่ได้รัน Notebook หรือ Training ซ้ำ และไม่ได้ยืนยันการติดตั้ง environment ใหม่
+### 4. Catastrophic forgetting
+
+หลัง fine-tune บน DIBCO PSNR บน Kaggle ตกจาก 31.19 dB เหลือ 20.03–22.98 dB ทุกวิธี LoRA ก็ไม่ได้ช่วยกันลืม เพราะตอนใช้งาน adapter ยังถูกบวกเข้ากับ weights ถ้าจะใช้งานจริงต้องเก็บโมเดลหรือ adapter แยกตาม domain
+
+### 5. Knowledge Distillation และความเร็ว
+
+ภาพ 540×420, batch 1, Tesla T4, ค่า median จาก 50 รอบ
+
+| โมเดล | Params | Kaggle PSNR (dB) | Latency (ms) |
+|---|---|---|---|
+| midterm CNN | 7,265 | 27.71 | 3.8 |
+| KD CNN | 7,265 | 28.84 | 4.0 |
+| U-Net edge + aug | 487,009 | 31.19 | 8.8 |
+| NAFNet fine-tuned | 29,159,715 | 31.19 | 140.6 |
+
+- KD ทำให้ CNN เล็กดีขึ้น +1.15 dB (median, p < 0.001) โดยขนาดและความเร็วเท่าเดิม
+- NAFNet ได้ PSNR บน Kaggle เท่ากับ U-Net แต่ช้ากว่าราว 16 เท่า
+
+### Ablation: edge loss เทียบกับ seed
+
+- λ = 0 ได้ 31.48 dB และ λ = 0.5 ได้ 32.15 dB
+- แต่แค่เปลี่ยน seed (42, 43, 44) ผลก็แกว่งอยู่ที่ 31.19–31.64 dB ต่างกันได้ 0.45 dB
+- ความต่างจาก λ มีขนาดพอ ๆ กับความแกว่งจาก seed จึง**ยังสรุปไม่ได้**ว่า edge loss ช่วยเพิ่ม PSNR บน Kaggle
+
+## สรุป
+
+1. **Augmentation** ช่วยเรื่อง domain shift ได้ชัด: +2.95 dB บน Augraphy (17.48 เทียบ 14.53) แต่บน Kaggle ไม่ได้ต่างจาก midterm อย่างมีนัยสำคัญ
+2. **Fine-tune** ด้วยข้อมูล 16 ภาพ ทำให้ใช้กับ dataset ใหม่ได้ (FM 61.9 → 84.4, NAFNet 88.0) และ LoRA ได้ผลเท่า full แต่ทุกวิธีลืมงานเดิม
+3. **Knowledge Distillation** ทำให้โมเดลเล็กดีขึ้น 1.13 dB (28.84 เทียบ 27.71) โดยไม่เสียความเร็ว
 
 ## Limitations
 
-- ยังไม่มี OCR Character Error Rate/Word Error Rate หรือการประเมินความอ่านง่ายจากมนุษย์ จึงไม่สรุปว่าความแม่นยำ OCR ดีขึ้น
-- Test มีเพียง 6 กลุ่มเอกสาร; noisy variants ในกลุ่มเดียวกันไม่ใช่ตัวอย่างอิสระทั้งหมด
-- เป็นผลชุดเดียว Seed 42 ไม่มีหลาย seeds หรือช่วงความเชื่อมั่นให้สรุปนัยสำคัญทางสถิติ
-- ความเร็วและหน่วยความจำเป็นผล evaluation บน T4, batch 1 ตามวิธีจับเวลาข้างต้น ไม่แทน CPU, Edge Device หรือ Production API
-- ไม่พบผลข้าม Dataset ใน Final ZIP; ไม่อ้างว่าทำงานได้กับเอกสารทุกชนิด
-- การมี outputs และไฟล์ผลสอดคล้องกันไม่เท่ากับการยืนยันว่ารันซ้ำจาก environment ใหม่แล้วได้ค่าเดิมทุกหลักทศนิยม
+- Kaggle test 24 ภาพมาจากเอกสารแค่ 6 หน้า ภาพจึงไม่อิสระต่อกันจริง ค่า p อาจดูดีเกินจริง
+- มีหลาย seed เฉพาะ `unet_edge_aug` ความต่างระหว่างโมเดลที่น้อยกว่าราว 0.5 dB จึงจัดอันดับไม่ได้
+- pFM และ DRD เขียนเอง ยังไม่ได้เทียบกับ evaluation tool ทางการของ DIBCO
+- Latency ของ LoRA วัดตอนยังไม่ merge adapter เข้า weights จึงช้ากว่าความจริง
+- ยังไม่ได้วัด OCR accuracy ว่าหลัง denoise แล้วอ่านตัวอักษรได้ถูกต้องขึ้นจริงหรือไม่
+- License ของ DIBCO ไม่ได้ระบุชัด ใช้เพื่อการศึกษาเท่านั้น
 
-## แหล่งหลักฐานและความสมบูรณ์ของสำเนา
+## วิธีเปิดดูและรัน
 
-ข้อมูลในเอกสารนี้อ้างอิง Final Notebook และ Final ZIP ภายใน `mini_project/FINAL_SUBMISSION/` เท่านั้น ไม่ใช้คะแนนจาก ZIP หรือ Notebook รุ่นเก่า
+- **ดูผลอย่างเดียว:** เปิด notebook ผ่านลิงก์ Colab ด้านบน output จาก Colab บันทึกไว้แล้ว ไม่ต้อง Run All
+- **รันซ้ำ:** ต้องใช้ GPU (Colab T4) และ checkpoint/ข้อมูลใน Google Drive (`MyDrive/AIE464_runs`) ซึ่งไม่ได้อยู่ใน repository นี้เพราะไฟล์ใหญ่ ขั้นตอนอยู่ใน notebook
+- **โค้ดและ unit test บนเครื่อง:**
 
-Final ZIP SHA256:
-
-```text
-f7d92b9abb4f81b38afeb940d5e7df3c04ed99a8678bc7a694624d5464ed5d6c
+```bash
+cd mini_project
+python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
+.venv/bin/python -m pytest
 ```
 
-`mini_project/results/final/` มีสำเนา 8 ไฟล์: Benchmark JSON 1 ไฟล์, Validation logs 4 ไฟล์ และ PNG 3 ไฟล์ ตรวจว่า byte และ SHA256 ตรงกับแต่ละ entry ใน Final ZIP โดยไม่ได้คัดลอกหรือแก้ checkpoints และไม่ได้เปลี่ยนไฟล์ใน `FINAL_SUBMISSION/`
+## ผล midterm (สำหรับเทียบ)
+
+ตอน midterm เทียบ 4 configurations บน Kaggle test ด้วย seed 42 เทรน 20 epochs:
+
+| Configuration | PSNR (dB) | SSIM |
+|---|---|---|
+| `cnn_l1` | 27.71 | 0.981 |
+| `dncnn_lite` | 31.67 | 0.992 |
+| `unet_l1` | 31.51 | 0.986 |
+| `unet_edge` | 31.84 | 0.989 |
+
+ค่าข้างบนเป็นค่าที่นำ checkpoint ของ midterm มาประเมินซ้ำด้วยโค้ดชุด final ส่วนไฟล์ midterm เดิมอยู่ที่ [`mini_project/FINAL_SUBMISSION/`](mini_project/FINAL_SUBMISSION/) และ [`mini_project/results/final/`](mini_project/results/final/) (ในไฟล์เดิม `unet_edge` ได้ 31.865 dB ซึ่งมาจากอีกรันหนึ่งที่ไม่มี checkpoint เหลืออยู่)
