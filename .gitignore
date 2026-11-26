@@ -30,6 +30,8 @@
 /mini_project/notebooks/*
 !/mini_project/notebooks/final_colab.ipynb
 !/mini_project/notebooks/build_final_colab.py
+!/mini_project/notebooks/cross_domain_colab.ipynb
+!/mini_project/notebooks/build_cross_domain_colab.py
 !/mini_project/tools/
 /mini_project/tools/*
 !/mini_project/tools/*.py

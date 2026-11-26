@@ -41,3 +41,36 @@ def test_notebook_smoke_executes(tmp_path):
     NotebookClient(nb, timeout=900, kernel_name='python3', resources={'metadata': {'path': str(tmp_path)}}).execute()
     assert (tmp_path / 'runs' / 'pilot_unet_edge_aug' / 'best.pt').exists()
     assert (tmp_path / 'runs' / 'summary.json').exists()
+
+
+from build_cross_domain_colab import NB_PATH as XD_NB_PATH  # noqa: E402
+from build_cross_domain_colab import build_notebook as build_cross_domain_notebook  # noqa: E402
+from build_cross_domain_colab import write_notebook as write_cross_domain_notebook  # noqa: E402
+
+
+def test_cross_domain_notebook_committed_copy_is_current():
+    if not XD_NB_PATH.exists():
+        pytest.skip('cross-domain notebook not generated yet')
+    nb = nbformat.read(XD_NB_PATH, as_version=4)
+    if any(c.get('outputs') for c in nb.cells):
+        pytest.skip('notebook holds real Colab outputs')
+    assert [c.source for c in nb.cells] == [c.source for c in build_cross_domain_notebook().cells]
+
+
+def test_cross_domain_builder_refuses_executed(tmp_path):
+    nb = build_cross_domain_notebook()
+    nb.cells[1].outputs = [nbformat.v4.new_output('stream', text='ran on Colab')]
+    path = tmp_path / 'cross_domain_colab.ipynb'
+    nbformat.write(nb, path)
+    with pytest.raises(SystemExit):
+        write_cross_domain_notebook(path)
+
+
+@pytest.mark.slow
+def test_cross_domain_notebook_smoke_executes(tmp_path):
+    nb = build_cross_domain_notebook(smoke=True, local_repo=MINI_PROJECT)
+    NotebookClient(nb, timeout=900, kernel_name='python3', resources={'metadata': {'path': str(tmp_path)}}).execute()
+    runs = tmp_path / 'runs'
+    assert (runs / 'xd_augraphy_unet' / 'best.pt').exists() and (runs / 'xd_augraphy_kd' / 'best.pt').exists()
+    assert (runs / 'eval_xd' / 'xd_augraphy_kd.json').exists()
+    assert (runs / 'cross_domain.md').exists()
