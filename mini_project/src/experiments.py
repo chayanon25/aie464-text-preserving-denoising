@@ -33,7 +33,44 @@ _jobs = [
     JobConfig(job_id='nafnet_ft_dibco_lora8', data='dibco', init_from='nafnet_ft', lora_rank=8, lora_1x1=True,
               **{**_NAF, 'lr': 1e-3, 'min_lr': 1e-5}),
 ]
+
+# Cross-domain benchmark (3 sources x 5 models, tested zero-shot on every test set).
+# Each model keeps its Kaggle recipe; only `data` (and the KD teacher) changes.
+CROSS_DOMAIN_MODELS = ('unet', 'dncnn', 'cnn', 'kd', 'nafnet')
+_KAGGLE_REUSE = {'unet': 'unet_edge_aug', 'dncnn': 'dncnn_nobn_aug', 'kd': 'kd_cnn', 'nafnet': 'nafnet_ft'}
+
+
+def cross_domain_job_id(source, model):
+    if source == 'kaggle' and model in _KAGGLE_REUSE:
+        return _KAGGLE_REUSE[model]
+    return f'xd_{source}_{model}'
+
+
+def _cross_domain_job(source, model):
+    job_id = cross_domain_job_id(source, model)
+    base = {**_IMPROVED, 'data': source}
+    if model == 'unet':
+        return JobConfig(job_id=job_id, model='unet', **base)
+    if model == 'dncnn':
+        return JobConfig(job_id=job_id, model='dncnn_nobn', **base)
+    if model == 'cnn':   # no teacher: the baseline that KD is compared against
+        return JobConfig(job_id=job_id, model='cnn', **base)
+    if model == 'kd':    # teacher trained on the same source, never on Kaggle
+        return JobConfig(job_id=job_id, model='cnn', kd_teacher=cross_domain_job_id(source, 'unet'),
+                         kd_alpha=0.5, **base)
+    return JobConfig(job_id=job_id, data=source, init_from='nafnet:sidd', **_NAF)
+
+
+_jobs.append(_cross_domain_job('kaggle', 'cnn'))
+_jobs += [_cross_domain_job(source, model) for source in ('augraphy', 'dibco') for model in CROSS_DOMAIN_MODELS]
 JOBS = {job.job_id: job for job in _jobs}
+
+# Same budgets as the Kaggle jobs they mirror; confirm after the pilot.
+# Insertion order is run order: each KD teacher (unet) comes before its student.
+CROSS_DOMAIN_BUDGETS = {'xd_kaggle_cnn': (30, 2000)}
+for _source in ('augraphy', 'dibco'):
+    for _model in CROSS_DOMAIN_MODELS:
+        CROSS_DOMAIN_BUDGETS[cross_domain_job_id(_source, _model)] = (20, 1000) if _model == 'nafnet' else (30, 2000)
 
 
 def with_budget(job_id, epochs, samples_per_epoch, **overrides):

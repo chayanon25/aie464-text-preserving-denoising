@@ -43,7 +43,8 @@ def test_jobs_ids_complete_and_unfilled():
     expected = {'pilot_unet_edge_aug', 'unet_edge_aug', 'dncnn_nobn_aug', 'unet_aug_l0', 'unet_aug_l05',
                 'ft_full', 'ft_freeze_enc', 'ft_lora4', 'ft_lora8', 'kd_cnn', 'unet_edge_aug_s43',
                 'unet_edge_aug_s44', 'nafnet_short_ft', 'nafnet_ft', 'nafnet_ft_dibco_full', 'nafnet_ft_dibco_lora8'}
-    assert set(JOBS) == expected and all(k == v.job_id for k, v in JOBS.items())
+    original = {k for k in JOBS if not k.startswith('xd_')}   # xd_* = cross-domain jobs (test_experiments.py)
+    assert original == expected and all(k == v.job_id for k, v in JOBS.items())
 
 
 def test_prepare_model_lora_from_midterm():
