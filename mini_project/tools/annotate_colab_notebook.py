@@ -210,6 +210,29 @@ for name, caption in CAPTIONS:
         display(Markdown(f'**{caption}**'))
         display(Image(filename=str(path)))"""
 
+XD_MD = """### 7.3 Cross-domain benchmark (zero-shot 3 × 3)
+ทำเพิ่มตามที่อาจารย์ขอ: เทรนแต่ละโมเดลบน 1 domain (Kaggle, Augraphy หรือ DIBCO) แล้วทดสอบทันทีโดยไม่ fine-tune บน test set ทั้ง 3 ชุด ได้ 6 transfer task (K→A, K→D, A→K, A→D, D→K, D→A) × 5 โมเดล ใช้ recipe และ budget เดียวกับ job บน Kaggle ส่วน KD-CNN ใช้ teacher เป็น SmallUNet ที่เทรนบน domain เดียวกัน
+
+เทรนด้วย `notebooks/cross_domain_colab.ipynb` บน Colab T4 cell นี้อ่านผลประเมินจาก `eval_xd/*.json` สร้างตาราง PSNR, FM, transfer gap และค่าเฉลี่ย 6 task แล้ววาดภาพผลลัพธ์ของ 6 task จาก checkpoint `xd_*`
+
+> **ShallowCNN และ KD-CNN ที่เทรนบน DIBCO collapse:** output เป็นภาพขาวทั้งหน้า (val PSNR คงที่ 10.01 dB, FM = 0) เพราะ ground truth ของ DIBCO เป็นพื้นขาว 94% เราลองลด learning rate และเพิ่ม residual แล้วยังเหมือนเดิม จึงรายงานเป็น finding"""
+
+XD = """# 14. Cross-domain benchmark: 3x3 tables, mean over the 6 transfer tasks, qualitative grid
+from IPython.display import Image, Markdown, display
+from src.cross_domain import write_cross_domain_report
+EVAL_XD = RUNS / 'eval_xd' if IN_COLAB else MINI / 'results' / 'cross_domain' / 'eval'
+XD_MD_PATH = FIG_DIR / 'cross_domain.md'
+FIG_DIR.mkdir(parents=True, exist_ok=True)
+write_cross_domain_report(EVAL_XD, XD_MD_PATH)
+display(Markdown(XD_MD_PATH.read_text()))
+_r = subprocess.run([sys.executable, str(MINI / 'tools' / 'make_figures.py'), '--xd-only', '--runs', str(RUNS), '--out', str(FIG_DIR)],
+                    capture_output=True, text=True)
+print(_r.stdout[-1000:], _r.stderr[-1000:])
+xd_fig = FIG_DIR / 'cross_domain' / 'xd_qual.png'
+if xd_fig.exists():
+    display(Markdown('**ผลลัพธ์ของ 6 transfer task (ขยายบริเวณที่มีตัวอักษรมากที่สุด) แถว = source → test set, คอลัมน์ = โมเดล**'))
+    display(Image(filename=str(xd_fig)))"""
+
 CONCLUSION = """## 8. ข้อสรุปที่มีตัวเลขรองรับ
 
 1. **Augmentation ไม่ได้ทำให้ผล in-domain ดีขึ้นอย่างมีนัยสำคัญ แต่ทำให้ทนต่อ domain shift ได้ชัดเจน**
@@ -225,6 +248,9 @@ CONCLUSION = """## 8. ข้อสรุปที่มีตัวเลขร�
    - Kaggle: `nafnet_ft` 31.19 dB เท่ากับ U-Net (p=1.0) แต่ params มากกว่า 60 เท่าและช้ากว่า 16 เท่า (141 ms เทียบ 9 ms)
    - Zero-shot ได้แค่ 14.97 dB เพราะเดิมเทรนกับ noise ของกล้อง (SIDD) ไม่ใช่ noise ของเอกสาร
 8. **Fine-tune บน DIBCO ทำให้ลืมงานเดิม (catastrophic forgetting):** Kaggle PSNR ตกจาก 31.2 เหลือ 20.0–23.0 dB ทุกวิธี LoRA ไม่ช่วยเพราะ adapter ทำงานตลอด การใช้งานจริงต้องสลับ adapter ตาม domain หรือเทรนร่วมทั้งสอง domain
+9. **Cross-domain 6 task: ไม่มี domain ไหนที่เทรนแล้วใช้ได้กับทุก domain:** ช่อง in-domain ดีที่สุดเกือบทุกคอลัมน์ ค่าเฉลี่ย 6 task เรียงตาม PSNR คือ NAFNet 17.57 dB, SmallUNet 16.95, DnCNN-lite 15.71, KD-CNN 13.57 และ ShallowCNN 13.56 ส่วน FM เฉลี่ย SmallUNet สูงกว่า NAFNet เล็กน้อย (76.98 เทียบ 76.63) ทั้งที่ params น้อยกว่า 60 เท่า
+10. **Augraphy เป็น source ที่ transfer ไป DIBCO ได้ดีกว่า Kaggle:** FM บน DIBCO 67.7–71.4 เทียบ 36.0–66.5 แต่ยังต่ำกว่าโมเดลที่เทรนบน DIBCO เอง (SmallUNet 85.1, NAFNet 86.6)
+11. **โมเดลเล็กมาก collapse บนข้อมูลไม่สมดุล:** ShallowCNN และ KD-CNN ที่เทรนบน DIBCO ตอบภาพขาวทั้งภาพ KD ไม่ช่วยเพราะ student ติดที่จุดเดียวกันก่อนจะได้ประโยชน์จาก teacher
 
 ## 9. ข้อจำกัด
 
@@ -252,7 +278,7 @@ def annotate(nb):
     for i, cell in enumerate(cells[1:], start=1):
         assert cell['cell_type'] == 'code'
         out += [md(BEFORE[i]), cell]
-    out += [md(REPORT_INTRO), code(SETUP), md(TABLES_MD), code(TABLES), md(FIGS_MD), code(FIGS), md(CONCLUSION)]
+    out += [md(REPORT_INTRO), code(SETUP), md(TABLES_MD), code(TABLES), md(FIGS_MD), code(FIGS), md(XD_MD), code(XD), md(CONCLUSION)]
     nb['cells'] = out
     return nb
 
