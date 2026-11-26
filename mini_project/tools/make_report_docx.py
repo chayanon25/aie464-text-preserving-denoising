@@ -182,6 +182,18 @@ class Report:
             for row in tab.rows:
                 for cell, w in zip(row.cells, widths):
                     cell.width = Inches(w)
+        # Layout: repeat the header row on a new page, never split a row, and keep
+        # short tables on one page (keep_with_next on every row but the last).
+        keep_whole = len(tab.rows) <= 25
+        for i, row in enumerate(tab.rows):
+            tr_pr = row._tr.get_or_add_trPr()
+            tr_pr.append(OxmlElement('w:cantSplit'))
+            if i == 0:
+                tr_pr.append(OxmlElement('w:tblHeader'))
+            if keep_whole and i < len(tab.rows) - 1:
+                for cell in row.cells:
+                    for par in cell.paragraphs:
+                        par.paragraph_format.keep_with_next = True
         self.doc.add_paragraph().paragraph_format.space_after = Pt(2)
 
     def figure(self, path, caption, width=6.0):
@@ -278,16 +290,16 @@ CONTENTS = [
     (2, '2.2 Augraphy Shift Test Set', 3), (2, '2.3 Metric ที่ใช้วัดผล', 3),
     (1, '3. วิธีการ (Method)', 3), (2, '3.1 SmallUNet (โมเดลหลัก)', 3),
     (2, '3.2 Sobel Edge Loss', 4), (2, '3.3 Training Augmentation', 5),
-    (2, '3.4 เทคนิคหลัง Midterm', 5), (2, '3.5 โมเดลที่ใช้เปรียบเทียบ', 5),
-    (1, '4. การตั้งค่าการทดลอง (Experimental Setup)', 7), (2, '4.1 การเปรียบเทียบที่ยุติธรรม', 7),
+    (2, '3.4 เทคนิคหลัง Midterm', 5), (2, '3.5 โมเดลที่ใช้เปรียบเทียบ', 6),
+    (1, '4. การตั้งค่าการทดลอง (Experimental Setup)', 7), (2, '4.1 การเปรียบเทียบที่ยุติธรรม', 8),
     (1, '5. ผลการทดลอง (Results)', 8), (2, '5.1 In-domain (Kaggle test, 24 ภาพ)', 8),
-    (2, '5.2 Domain Shift (Augraphy, 24 ภาพ)', 9), (2, '5.3 Cross-dataset (DIBCO 2017, 20 ภาพ)', 10),
-    (2, '5.4 Fine-tune และการลืมงานเดิม (Forgetting)', 11), (2, '5.5 ประสิทธิภาพ (Efficiency)', 11),
-    (2, '5.6 การทดสอบนัยสำคัญ (Paired Wilcoxon Signed-rank, Two-sided)', 12),
-    (2, '5.7 Cross-domain Benchmark (Zero-shot 3 × 3)', 12), (2, '5.8 ผลเชิงคุณภาพ', 14),
-    (1, '6. อภิปรายผล (Discussion)', 14),
-    (1, '7. ข้อจำกัดและสรุป (Limitations and Conclusion)', 16), (2, '7.1 ข้อจำกัด', 16),
-    (2, '7.2 สรุป', 16), (1, 'เอกสารอ้างอิง (References)', 17),
+    (2, '5.2 Domain Shift (Augraphy, 24 ภาพ)', 10), (2, '5.3 Cross-dataset (DIBCO 2017, 20 ภาพ)', 10),
+    (2, '5.4 Fine-tune และการลืมงานเดิม (Forgetting)', 11), (2, '5.5 ประสิทธิภาพ (Efficiency)', 12),
+    (2, '5.6 การทดสอบนัยสำคัญ (Paired Wilcoxon Signed-rank, Two-sided)', 13),
+    (2, '5.7 Cross-domain Benchmark (Zero-shot 3 × 3)', 13), (2, '5.8 ผลเชิงคุณภาพ', 15),
+    (1, '6. อภิปรายผล (Discussion)', 17),
+    (1, '7. ข้อจำกัดและสรุป (Limitations and Conclusion)', 18), (2, '7.1 ข้อจำกัด', 18),
+    (2, '7.2 สรุป', 18), (1, 'เอกสารอ้างอิง (References)', 19),
 ]
 
 
