@@ -41,6 +41,26 @@ def transfer_gap(matrix):
     return {(m, s, t): v - matrix[(m, t, t)] for (m, s, t), v in matrix.items() if s != t}
 
 
+def transfer_mean(matrix):
+    """{model: mean of its 6 off-diagonal cells (source != target)}; nan if any cell is missing."""
+    means = {}
+    for model in CROSS_DOMAIN_MODELS:
+        cells = [v for (m, s, t), v in matrix.items() if m == model and s != t]
+        means[model] = sum(cells) / len(cells) if cells and all(math.isfinite(v) for v in cells) else float('nan')
+    return means
+
+
+def transfer_mean_markdown(eval_dir):
+    """One table: mean PSNR and FM over the 6 transfer tasks per model, ranked by PSNR."""
+    psnr = transfer_mean(build_matrix(eval_dir, 'psnr'))
+    fm = transfer_mean(build_matrix(eval_dir, 'fm'))
+    order = sorted(CROSS_DOMAIN_MODELS, key=lambda m: -psnr[m] if math.isfinite(psnr[m]) else math.inf)
+    lines = [f'| Rank | Model | Mean {METRIC_LABEL["psnr"]} | Mean {METRIC_LABEL["fm"]} |', '|---|---|---|---|']
+    for rank, model in enumerate(order, 1):
+        lines.append(f'| {rank} | {MODEL_LABEL[model]} | {_fmt(psnr[model])} | {_fmt(fm[model])} |')
+    return '\n'.join(lines) + '\n'
+
+
 def _fmt(value, signed=False):
     if not math.isfinite(value):
         return '-'
@@ -77,6 +97,8 @@ def write_cross_domain_report(eval_dir, out_path):
         full = {k: gap.get(k, float('nan')) for k in build_matrix(eval_dir, metric)}
         parts += [f'\n## Transfer gap, {METRIC_LABEL[metric]} (cross-domain minus in-domain on the same test set)\n\n',
                   matrix_markdown(full, metric, gap=True)]
+    parts += ['\n## Mean over the 6 transfer tasks (source != target, zero-shot)\n\n',
+              transfer_mean_markdown(eval_dir)]
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(''.join(parts))

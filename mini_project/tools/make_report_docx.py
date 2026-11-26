@@ -20,7 +20,7 @@ from docx.shared import Inches, Pt, RGBColor
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from src.cross_domain import DOMAIN_LABEL, MODEL_LABEL, build_matrix  # noqa: E402
+from src.cross_domain import DOMAIN_LABEL, MODEL_LABEL, build_matrix, transfer_mean  # noqa: E402
 from src.domains import DOMAINS  # noqa: E402
 from src.experiments import CROSS_DOMAIN_MODELS  # noqa: E402
 
@@ -219,6 +219,18 @@ def cross_domain_rows(metric):
     return rows
 
 
+def transfer_mean_rows():
+    """Rank, model, mean PSNR and FM over the 6 zero-shot transfer tasks (source != target)."""
+    psnr = transfer_mean(build_matrix(EVAL_XD, 'psnr'))
+    fm = transfer_mean(build_matrix(EVAL_XD, 'fm'))
+    order = sorted(CROSS_DOMAIN_MODELS, key=lambda m: -psnr[m])
+    rows = []
+    for rank, model in enumerate(order, 1):
+        note = ' (collapsed เมื่อเทรนบน DIBCO)' if any(mm == model for mm, _ in COLLAPSED) else ''
+        rows.append([str(rank), MODEL_LABEL[model] + note, f'{psnr[model]:.2f}', f'{fm[model]:.2f}'])
+    return rows
+
+
 def equation_png(path):
     fig = plt.figure(figsize=(8, 0.7))
     fig.text(0.5, 0.5,
@@ -405,7 +417,22 @@ def body(r, eq_png):
     r.p('**LoRA (Low-Rank Adaptation)** คือการ fine-tune โดยแช่แข็งน้ำหนักเดิม แล้วเทรนเฉพาะ adapter '
         'ขนาดเล็กที่บวกเข้าไป ส่วน **Knowledge Distillation** คือการให้โมเดลเล็ก (student) '
         'เรียนจาก output ของโมเดลใหญ่ (teacher)')
+    r.p('**LoRA กับโมเดลภาพ:** LoRA ถูกเสนอครั้งแรกสำหรับ language model แต่หลักการใช้ได้กับทุกชั้นที่เป็นการคูณน้ำหนัก '
+        'งานนี้ใช้กับ Conv2d (src/lora.py) โดยแช่แข็ง conv เดิม แล้วบวก adapter 2 ชั้น คือ conv A ขนาด kernel เท่าเดิม '
+        'ที่ลด channel เหลือ r และ conv B ขนาด 1×1 ที่ขยายกลับ output = conv(x) + (α/r)·B(A(x)) '
+        'B เริ่มเป็นศูนย์ โมเดลตอนเริ่ม fine-tune จึงเท่ากับโมเดลเดิมทุกประการ และหลังเทรนรวม B·A กลับเข้า conv เดิมได้ '
+        '(merged_conv) ซึ่งในหลักการจะไม่เพิ่มเวลาตอนใช้งาน (ยังไม่ได้วัด latency หลัง merge ดูหัวข้อ 5.5)')
+    r.p('**ทำไม ft_lora8 ได้ FM เท่ากับ ft_full:** ตัวเลขไม่ได้เท่ากันทุกค่า FM 84.38 เทียบ 84.36 (p = 1.0) '
+        'แต่ PSNR 15.54 เทียบ 15.71 dB และ DRD 6.86 เทียบ 6.64 ส่วน rank 4 ได้ต่ำกว่า (FM 82.86) '
+        'และบน NAFNet LoRA r=8 ได้ต่ำกว่า full fine-tune ชัดเจน (85.28 เทียบ 87.98) '
+        'ข้อสันนิษฐานคือการปรับ SmallUNet จาก Kaggle ไป DIBCO ต้องการการเปลี่ยนน้ำหนักไม่มาก '
+        'และข้อมูล fine-tune มีน้อย (DIBCO 2018 + 2019A) full fine-tune จึงไม่ได้เปรียบจากจำนวน params ที่มากกว่า '
+        'ข้อนี้ยังไม่ได้พิสูจน์ด้วยการทดลองเพิ่ม เช่น วัด rank ของ ΔW จริง')
     r.h2('3.5 โมเดลที่ใช้เปรียบเทียบ')
+    r.p('**Proposed method ของงานนี้** คือ SmallUNet + Sobel edge loss + augmentation (job unet_edge_aug) '
+        'ส่วน Knowledge Distillation ไม่ได้ใช้กับ SmallUNet แต่ใช้ SmallUNet ตัวนี้เป็น teacher '
+        'เพื่อสอน ShallowCNN (job kd_cnn และ xd_*_kd) ให้ได้โมเดลเล็กที่เร็วที่สุด '
+        'โมเดลอื่นในตารางเป็น baseline (ShallowCNN, DnCNN-lite) หรือโมเดลใหญ่ที่ใช้เปรียบเทียบ (NAFNet)')
     r.table('โมเดลทั้งหมดในงานนี้', ['โมเดล', 'Params', 'โครงสร้าง', 'บทบาท'], [
         ['SmallUNet', '487,009', 'U-Net 3 ชั้น + skip (concat), residual', 'โมเดลหลัก'],
         ['NAFNet', '29,159,715', 'U-Net 4 ชั้นของ NAFBlock + skip (add), pretrained บน SIDD, '
@@ -547,6 +574,11 @@ def body(r, eq_png):
             widths=[1.7, 1.0, 1.2, 1.2, 1.2])
     r.table('FM (%) ของ cross-domain benchmark (binarize ด้วย Otsu)', header, cross_domain_rows('fm'),
             widths=[1.7, 1.0, 1.2, 1.2, 1.2])
+    r.p('ตารางด้านล่างสรุปทั้ง 6 task ในตารางเดียว (K → A, K → D, A → K, A → D, D → K, D → A) '
+        'โดยเฉลี่ยเฉพาะช่องที่ source ต่างจาก test set ช่องที่ collapse นับด้วยค่าจริง (PSNR 10.32–11.07 dB, FM 0) '
+        'เพราะเป็นผลที่เกิดขึ้นจริงเมื่อนำโมเดลไปใช้')
+    r.table('ค่าเฉลี่ยของ 6 transfer task แบบ zero-shot เรียงตาม PSNR', ['อันดับ', 'Model', 'PSNR เฉลี่ย (dB)',
+            'FM เฉลี่ย (%)'], transfer_mean_rows(), widths=[0.7, 3.0, 1.3, 1.3])
     r.items([
         '**ทดสอบบน Kaggle:** โมเดลที่เทรนจาก domain อื่นเสีย PSNR มาก (-7.1 ถึง -13.7 dB) '
         'NAFNet เสียน้อยที่สุด (Augraphy → Kaggle 24.10 dB, DIBCO → Kaggle 22.51 dB)',
@@ -554,6 +586,9 @@ def body(r, eq_png):
         'แต่ยังต่ำกว่าโมเดลที่เทรนบน DIBCO เอง (SmallUNet 85.1, NAFNet 86.6)',
         '**DIBCO → Kaggle ใน FM:** SmallUNet และ NAFNet ได้ 89.4 และ 88.9 สูงกว่า in-domain เล็กน้อย '
         'แต่ PSNR ต่ำกว่ามาก แปลว่าตัวอักษรยังอยู่ครบ แต่พื้นหลังยังไม่สะอาด',
+        '**ภาพรวม 6 task:** NAFNet ได้ PSNR เฉลี่ยสูงสุด (17.57 dB) และ SmallUNet ตามมาใกล้กัน (16.95 dB) '
+        'แต่ใน FM เฉลี่ย SmallUNet สูงกว่าเล็กน้อย (76.98 เทียบ 76.63) ทั้งที่มี params น้อยกว่า 60 เท่า '
+        'ShallowCNN และ KD-CNN อยู่ท้ายเพราะแถวที่เทรนบน DIBCO collapse',
         '**ShallowCNN และ KD-CNN บน DIBCO collapse:** ทั้งสองแถวออกภาพขาวทั้งหน้า '
         '(val PSNR คงที่ 10.01 dB ตั้งแต่ epoch แรก, FM = 0 ทุก test set) จึงไม่แสดงเป็นตัวเลข ดูการวิเคราะห์ในหัวข้อ 6',
     ])
@@ -568,6 +603,12 @@ def body(r, eq_png):
     ])
     r.figure(FIG / 'qual_augraphy_shift.png', 'ผลเชิงคุณภาพบน Augraphy shift')
     r.figure(FIG / 'qual_dibco2017.png', 'ผลเชิงคุณภาพบน DIBCO 2017')
+    xd_fig = FIG / 'cross_domain' / 'xd_qual.png'
+    if xd_fig.exists():
+        r.figure(xd_fig, 'ผลเชิงคุณภาพของ 6 transfer task แบบ zero-shot (ภาพขยายบริเวณที่มีตัวอักษรมากที่สุด) '
+                         'แต่ละแถวคือ source → test set และแต่ละคอลัมน์คือโมเดล')
+    else:
+        print('skip figure', xd_fig, '(run tools/make_figures.py --xd-only after downloading xd_* checkpoints)')
 
     r.h1('6. อภิปรายผล (Discussion)')
     r.items([

@@ -80,3 +80,13 @@ Rows: model trained on Source. Columns: test set. Bold = in-domain. "-" = not ev
 | NAFNet | Kaggle |  | -2.67 | -20.10 |
 | NAFNet | Augraphy | -4.16 |  | -18.28 |
 | NAFNet | DIBCO | +0.03 | -6.69 |  |
+
+## Mean over the 6 transfer tasks (source != target, zero-shot)
+
+| Rank | Model | Mean PSNR (dB) | Mean FM (%) |
+|---|---|---|---|
+| 1 | NAFNet | 17.57 | 76.63 |
+| 2 | SmallUNet (edge+aug) | 16.95 | 76.98 |
+| 3 | DnCNN-lite | 15.71 | 68.85 |
+| 4 | KD-CNN | 13.57 | 44.20 |
+| 5 | ShallowCNN | 13.56 | 43.62 |

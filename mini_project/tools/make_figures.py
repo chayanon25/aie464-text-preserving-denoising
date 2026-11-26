@@ -19,7 +19,10 @@ import torch.nn.functional as F  # noqa: E402
 
 MINI = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(MINI))
+from src.cross_domain import DOMAIN_LABEL, MODEL_LABEL, TESTSET_OF  # noqa: E402
+from src.domains import DOMAINS  # noqa: E402
 from src.eval_suite import load_testsets  # noqa: E402
+from src.experiments import CROSS_DOMAIN_MODELS, cross_domain_job_id  # noqa: E402
 from src.infer import denoise  # noqa: E402
 from src.models.unet import SmallUNet  # noqa: E402
 from src.train_engine import load_trained  # noqa: E402
@@ -155,6 +158,43 @@ def fig_qualitative(sets, runs, out):
             _save(fig, out / f'{kind}_{testset}.png')
 
 
+def fig_cross_domain(sets, runs, out, size=192, pad=32):
+    """xd_qual.png: rows = the 6 zero-shot transfer tasks (source -> test set), columns = input,
+    the 5 models trained on that source, ground truth. Each row is the inkiest window of the
+    first image of that test set; models see the window plus `pad` px of context."""
+    tasks = [(s, t) for s in DOMAINS for t in DOMAINS if s != t]
+    refs = {(s, m): cross_domain_job_id(s, m) for s in DOMAINS for m in CROSS_DOMAIN_MODELS}
+    models = {key: _load(ref, runs) for key, ref in refs.items() if key[0] in {s for s, _ in tasks}}
+    missing = sorted(refs[k] for k, m in models.items() if m is None)
+    if missing:
+        print('skip xd_qual (missing checkpoints):', ', '.join(missing))
+        return
+    cols = ['input'] + [MODEL_LABEL[m] for m in CROSS_DOMAIN_MODELS] + ['ground truth']
+    fig, axes = plt.subplots(len(tasks), len(cols), figsize=(1.9 * len(cols), 2.0 * len(tasks)))
+    for row, (src, tgt) in enumerate(tasks):
+        sample = sets[TESTSET_OF[tgt]][0]
+        ys, xs = _crop(sample['clean'], size)
+        h, w = sample['noisy'].shape
+        y0, x0 = max(0, ys.start - pad), max(0, xs.start - pad)
+        y1, x1 = min(h, ys.stop + pad), min(w, xs.stop + pad)
+        inner = (slice(ys.start - y0, ys.stop - y0), slice(xs.start - x0, xs.stop - x0))
+        window = sample['noisy'][y0:y1, x0:x1]
+        panels = [window[inner]]
+        for m in CROSS_DOMAIN_MODELS:
+            panels.append(denoise(models[(src, m)], window, 'cpu')[inner])
+        panels.append(sample['clean'][ys, xs])
+        for col, img in enumerate(panels):
+            ax = axes[row, col]
+            ax.imshow(img, cmap='gray', vmin=0, vmax=1)
+            ax.set_xticks([]); ax.set_yticks([])
+            if row == 0:
+                ax.set_title(cols[col], fontsize=9)
+        axes[row, 0].set_ylabel(f'{DOMAIN_LABEL[src]} -> {DOMAIN_LABEL[tgt]}', fontsize=9)
+    fig.tight_layout()
+    (out / 'cross_domain').mkdir(parents=True, exist_ok=True)
+    _save(fig, out / 'cross_domain' / 'xd_qual.png')
+
+
 def fig_curves(runs, out):
     fig, axes = plt.subplots(1, len(CURVE_GROUPS), figsize=(13, 4))
     found = 0
@@ -179,15 +219,20 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--runs', default=str(MINI / 'outputs' / 'final' / 'runs'))
     ap.add_argument('--out', default=str(MINI.parent / 'docs' / 'figures'))
+    ap.add_argument('--xd-only', action='store_true', help='only the cross-domain qualitative grid')
     args = ap.parse_args()
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
     torch.manual_seed(42); np.random.seed(42)
     sets = load_testsets(**TESTSETS, required=('kaggle_test', 'augraphy_shift', 'dibco2017'))
+    if args.xd_only:
+        fig_cross_domain(sets, args.runs, out)
+        return
     fig_data_samples(sets, out)
     fig_sobel(sets, out)
     fig_unet(out)
     fig_qualitative(sets, args.runs, out)
     fig_curves(args.runs, out)
+    fig_cross_domain(sets, args.runs, out)
 
 
 if __name__ == '__main__':
