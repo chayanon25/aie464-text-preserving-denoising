@@ -17,6 +17,11 @@ Final project ต่อยอดจากโมเดล midterm (SmallUNet + So
 | [`docs/IMPROVEMENT_REPORT.md`](docs/IMPROVEMENT_REPORT.md) | รายงานผลฉบับเต็ม ตารางครบทุกโมเดล ค่า p และ limitations ตัวเลขทั้งหมดในหน้านี้มาจากไฟล์นี้ |
 | [`docs/figures/`](docs/figures/) | รูปที่ใช้ในรายงานและสไลด์ |
 | [`mini_project/src/`](mini_project/src/) | โค้ด pipeline (dataset, models, losses, train, evaluate, report) |
+| [`mini_project/notebooks/cross_domain_colab.ipynb`](mini_project/notebooks/cross_domain_colab.ipynb) | Cross-domain benchmark 3 × 3 (เทรนบน Kaggle / Augraphy / DIBCO แล้วทดสอบทั้ง 3 ชุด) |
+| [`mini_project/results/`](mini_project/results/) | ผลประเมินจริงที่ใช้ทำตาราง: `final_benchmark/` และ `cross_domain/` |
+| [`mini_project/midterm/`](mini_project/midterm/) | งาน midterm เก็บไว้เป็นประวัติ (ดู git tag `midterm`) |
+
+โครงสร้างโฟลเดอร์ละเอียดอยู่ใน [`mini_project/README.md`](mini_project/README.md)
 
 ## ข้อมูล
 
@@ -184,4 +189,4 @@ python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 | `unet_l1` | 31.51 | 0.986 |
 | `unet_edge` | 31.84 | 0.989 |
 
-ค่าข้างบนเป็นค่าที่นำ checkpoint ของ midterm มาประเมินซ้ำด้วยโค้ดชุด final ส่วนไฟล์ midterm เดิมอยู่ที่ [`mini_project/FINAL_SUBMISSION/`](mini_project/FINAL_SUBMISSION/) และ [`mini_project/results/final/`](mini_project/results/final/) (ในไฟล์เดิม `unet_edge` ได้ 31.865 dB ซึ่งมาจากอีกรันหนึ่งที่ไม่มี checkpoint เหลืออยู่)
+ค่าข้างบนเป็นค่าที่นำ checkpoint ของ midterm มาประเมินซ้ำด้วยโค้ดชุด final ส่วนไฟล์ midterm เดิมอยู่ที่ [`mini_project/midterm/`](mini_project/midterm/) (ในไฟล์เดิม `unet_edge` ได้ 31.865 dB ซึ่งมาจากอีกรันหนึ่งที่ไม่มี checkpoint เหลืออยู่)

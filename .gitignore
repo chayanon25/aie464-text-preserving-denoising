@@ -17,30 +17,26 @@
 
 /mini_project/*
 !/mini_project/README.md
-!/mini_project/PROJECT_SPEC.md
-!/mini_project/prepare_benchmark_bundle.py
-!/mini_project/src/
-!/mini_project/tests/
-!/mini_project/outputs/
-!/mini_project/FINAL_SUBMISSION/
-!/mini_project/results/
+
 !/mini_project/pytest.ini
 !/mini_project/requirements-dev.txt
+!/mini_project/src/
+!/mini_project/tests/
 !/mini_project/notebooks/
+!/mini_project/tools/
+!/mini_project/outputs/
+!/mini_project/results/
+!/mini_project/midterm/
+
+# Final project notebooks (the submission notebook and the cross-domain run).
 /mini_project/notebooks/*
 !/mini_project/notebooks/final_colab.ipynb
 !/mini_project/notebooks/build_final_colab.py
 !/mini_project/notebooks/cross_domain_colab.ipynb
 !/mini_project/notebooks/build_cross_domain_colab.py
-!/mini_project/tools/
 /mini_project/tools/*
 !/mini_project/tools/*.py
 
-# Legacy notebooks stay local. Publish one immutable final notebook only.
-/mini_project/FINAL_SUBMISSION/*
-!/mini_project/FINAL_SUBMISSION/aie464-text-preserving-image-denoising-final.ipynb
-
-# Development code remains available; recovery experiments stay local.
 /mini_project/src/*
 !/mini_project/src/*.py
 !/mini_project/src/models/
@@ -49,24 +45,13 @@
 /mini_project/tests/*
 !/mini_project/tests/*.py
 
-# Explicit allowlist for the eight byte-verified copies from the final ZIP.
+# Final project results: per-image eval JSON, latency and summary behind the report tables.
 /mini_project/results/*
-!/mini_project/results/final/
-/mini_project/results/final/*
-!/mini_project/results/final/final_test_benchmark.json
-!/mini_project/results/final/qualitative_test_comparisons.png
-!/mini_project/results/final/qualitative_zoom_comparisons.png
-!/mini_project/results/final/training_validation_curves.png
-!/mini_project/results/final/logs/
-/mini_project/results/final/logs/*
-!/mini_project/results/final/logs/cnn_l1/
-!/mini_project/results/final/logs/dncnn_lite/
-!/mini_project/results/final/logs/unet_l1/
-!/mini_project/results/final/logs/unet_edge/
-/mini_project/results/final/logs/*/*
-!/mini_project/results/final/logs/*/validation.json
+!/mini_project/results/final_benchmark/
+!/mini_project/results/cross_domain/
+/mini_project/results/**/*.pt
 
-# Keep the frozen split metadata, never experiment outputs or checkpoints.
+# Frozen split metadata only; never experiment outputs or checkpoints.
 /mini_project/outputs/*
 !/mini_project/outputs/phase1/
 /mini_project/outputs/phase1/*
@@ -74,9 +59,10 @@
 !/mini_project/outputs/final/
 /mini_project/outputs/final/*
 !/mini_project/outputs/final/dibco_split.json
-# Final Colab results (per-image eval JSON, latency, summary) back the report tables.
-!/mini_project/outputs/final/colab/
-/mini_project/outputs/final/colab/**/*.pt
+
+# Midterm archive (also tagged `midterm`): notebook, old pipeline code, byte-verified results.
+/mini_project/midterm/results/logs/*/*
+!/mini_project/midterm/results/logs/*/validation.json
 
 # Datasets and archives belong in local storage / Google Drive.
 **/data/

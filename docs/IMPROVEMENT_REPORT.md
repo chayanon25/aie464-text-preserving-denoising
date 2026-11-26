@@ -96,7 +96,7 @@ Budget ที่อนุมัติหลัง pilot มีดังนี้
 | classical_sauvola | 15.53 | 0.866 | 11.10 |
 | classical_otsu | 15.21 | 0.867 | 11.10 |
 
-> `midterm_unet_edge` ได้ 31.84 dB ตรงกับ `backups/.../final_test_benchmark.json` ส่วนค่า 31.865 dB ใน `results/final/` มาจากอีกรันหนึ่งที่ไม่มี checkpoint เหลืออยู่ จึงรายงานไว้ทั้งสองค่า
+> `midterm_unet_edge` ได้ 31.84 dB ตรงกับ `backups/.../final_test_benchmark.json` ส่วนค่า 31.865 dB ใน `mini_project/midterm/results/` มาจากอีกรันหนึ่งที่ไม่มี checkpoint เหลืออยู่ จึงรายงานไว้ทั้งสองค่า
 
 ### 6.2 Domain shift (Augraphy, 24 ภาพ)
 

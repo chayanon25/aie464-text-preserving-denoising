@@ -1,6 +1,6 @@
 """Build simple bar charts for the presentation from real Colab results.
 
-Reads outputs/final/colab/summary.json (eval results + latency from commit 75664d9)
+Reads results/final_benchmark/summary.json (eval results + latency from commit 75664d9)
 and writes docs/figures/slide_*.png. Numbers are never typed by hand.
 
 Usage: .venv/bin/python tools/make_slide_charts.py
@@ -13,7 +13,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parents[1]
-SUMMARY = ROOT / 'outputs/final/colab/summary.json'
+SUMMARY = ROOT / 'results/final_benchmark/summary.json'
 OUT = ROOT.parent / 'docs/figures'
 
 BASE = '#9aa0a6'      # baselines / older models

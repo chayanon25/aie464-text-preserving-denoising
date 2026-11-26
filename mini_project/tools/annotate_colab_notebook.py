@@ -160,8 +160,8 @@ if IN_COLAB:
 else:
     MINI = Path.cwd().resolve().parent  # this notebook lives in mini_project/notebooks/
     RUNS = MINI / 'outputs' / 'final' / 'runs'
-    EVAL_DIR = MINI / 'outputs' / 'final' / 'colab' / 'eval_zip' / 'eval'
-    LATENCY_PATH = MINI / 'outputs' / 'final' / 'colab' / 'latency.json'
+    EVAL_DIR = MINI / 'results' / 'final_benchmark'
+    LATENCY_PATH = MINI / 'results' / 'final_benchmark' / 'latency.json'
     FIG_DIR = MINI / 'outputs' / 'final' / 'notebook_figures'
 sys.path.insert(0, str(MINI))
 sha = subprocess.run(['git', '-C', str(MINI), 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True).stdout.strip()

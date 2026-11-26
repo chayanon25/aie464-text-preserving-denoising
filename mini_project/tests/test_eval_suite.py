@@ -13,10 +13,10 @@ from src.eval_suite import evaluate, load_midterm, predict_fn, save_eval
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / 'outputs' / 'phase1' / 'split_manifest.json'
 # Benchmark JSON saved alongside the midterm checkpoints we actually have.
-# results/final/ comes from a separate run whose unet_edge checkpoint is lost
+# midterm/results/ comes from a separate run whose unet_edge checkpoint is lost
 # (31.865 vs 31.836 dB); the other three models are identical in both files.
 BENCH_JSON = ROOT / 'backups' / 'aie464_final_artifacts' / 'final_test_benchmark.json'
-RESULTS_JSON = ROOT / 'results' / 'final' / 'final_test_benchmark.json'
+RESULTS_JSON = ROOT / 'midterm' / 'results' / 'final_test_benchmark.json'
 
 
 @pytest.mark.slow
