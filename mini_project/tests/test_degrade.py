@@ -59,6 +59,7 @@ def test_augraphy_train_split_size(kaggle_root, tmp_path):
     assert len(make_augraphy_split(kaggle_root, MANIFEST, tmp_path, 'train')['files']) == 100
 
 
+@pytest.mark.slow   # byte-exact only with the generating env (augraphy 8.2.6, local opencv/numpy); Colab differs
 def test_existing_shift_testset_unchanged(kaggle_root, tmp_path):
     ref = PROJECT_ROOT / 'data' / 'external' / 'augraphy_shift' / 'manifest.json'
     if not ref.exists():
