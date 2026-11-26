@@ -18,9 +18,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-NAFNET_WEIGHTS = Path(os.environ.get(
-    'NAFNET_WEIGHTS',
-    Path(__file__).resolve().parents[2] / 'data' / 'external' / 'nafnet' / 'NAFNet-SIDD-width32.pth'))
+DEFAULT_NAFNET_WEIGHTS = Path(__file__).resolve().parents[2] / 'data' / 'external' / 'nafnet' / 'NAFNet-SIDD-width32.pth'
+NAFNET_WEIGHTS = Path(os.environ.get('NAFNET_WEIGHTS', DEFAULT_NAFNET_WEIGHTS))   # value at import time
+
+
+def nafnet_weights_path():
+    """Current NAFNET_WEIGHTS env value (the notebook may set it after import)."""
+    return Path(os.environ.get('NAFNET_WEIGHTS', DEFAULT_NAFNET_WEIGHTS))
 
 
 class LayerNorm2d(nn.Module):
@@ -150,8 +154,9 @@ class GrayNAFNet(nn.Module):
         return y[..., :height, :width]
 
 
-def load_nafnet_sidd(path=NAFNET_WEIGHTS):
+def load_nafnet_sidd(path=None):
     """GrayNAFNet with official SIDD width-32 weights ('params' or 'state_dict' format)."""
+    path = nafnet_weights_path() if path is None else path
     ckpt = torch.load(path, map_location='cpu', weights_only=False)
     state = ckpt.get('params', ckpt.get('state_dict', ckpt)) if isinstance(ckpt, dict) else ckpt
     model = GrayNAFNet()

@@ -29,3 +29,11 @@ def test_nafnet_backward_runs():
 def test_nafnet_loads_sidd_if_present():
     if not NAFNET_WEIGHTS.exists(): pytest.skip('weights not downloaded')
     m = load_nafnet_sidd(NAFNET_WEIGHTS); assert sum(p.numel() for p in m.parameters()) > 1e6
+
+
+def test_weights_env_read_at_call_time(monkeypatch, tmp_path):
+    # Colab sets NAFNET_WEIGHTS after src is imported; the loader must still see it.
+    missing = tmp_path / 'set_after_import.pth'
+    monkeypatch.setenv('NAFNET_WEIGHTS', str(missing))
+    with pytest.raises(FileNotFoundError, match='set_after_import'):
+        load_nafnet_sidd()
