@@ -25,9 +25,10 @@ def make_smoke_samples(n, group='synthetic', binary_gt=False, seed=0, height=96,
 
 
 def smoke_data():
-    """Train/val sets for both data kinds plus small test sets."""
+    """Train/val sets for every source domain plus small test sets."""
     kaggle = {'train': make_smoke_samples(3, seed=1), 'val': make_smoke_samples(2, seed=2)}
     dibco = {'train': make_smoke_samples(3, binary_gt=True, seed=3), 'val': make_smoke_samples(2, binary_gt=True, seed=4)}
+    augraphy = {'train': make_smoke_samples(3, seed=8), 'val': make_smoke_samples(2, seed=9)}
     testsets = {'kaggle_test': make_smoke_samples(2, seed=5), 'augraphy_shift': make_smoke_samples(2, seed=6),
                 'dibco2017': make_smoke_samples(2, binary_gt=True, seed=7)}
-    return {'kaggle': kaggle, 'dibco': dibco, 'testsets': testsets}
+    return {'kaggle': kaggle, 'augraphy': augraphy, 'dibco': dibco, 'testsets': testsets}

@@ -59,3 +59,12 @@ def test_load_testsets_required_missing_raises(tmp_path):
     from src.eval_suite import load_testsets
     with pytest.raises(FileNotFoundError):
         load_testsets(tmp_path, MANIFEST, tmp_path, tmp_path, required=('kaggle_test', 'dibco2017'))
+
+
+def test_gray_metrics_include_fm():
+    from src.eval_suite import _gray_metrics
+    from src.metrics_binary import fmeasure
+    from src.smoke import make_smoke_samples
+    clean = make_smoke_samples(1, seed=5)[0]['clean']
+    m = _gray_metrics(clean, clean)
+    assert m['fm'] == pytest.approx(fmeasure(clean < 0.5, clean < 0.5))

@@ -1,6 +1,6 @@
 """One evaluation protocol for every model on the fixed test sets.
 
-Grayscale sets (kaggle_test, augraphy_shift): PSNR, SSIM, text-masked PSNR.
+Grayscale sets (kaggle_test, augraphy_shift): PSNR, SSIM, text-masked PSNR, FM.
 Binary sets (dibco2017): DIBCO FM / pFM / PSNR / DRD after Otsu binarization.
 """
 import json
@@ -15,7 +15,7 @@ from .dataset import load_kaggle_split
 from .degrade import load_shift_testset
 from .evaluate import image_metrics, text_masked_psnr
 from .infer import denoise
-from .metrics_binary import dibco_metrics
+from .metrics_binary import dibco_metrics, fmeasure, otsu_binarize
 from .models import MIDTERM_EXPERIMENTS, build_model
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -60,7 +60,9 @@ def _gray_metrics(pred, clean):
     p, c = torch.from_numpy(pred)[None, None], torch.from_numpy(clean)[None, None]
     scores = image_metrics(p, c)
     return {'psnr': float(scores['psnr'][0]), 'ssim': float(scores['ssim'][0]),
-            'text_psnr': float(text_masked_psnr(p, c)[0].clamp(max=100))}
+            'text_psnr': float(text_masked_psnr(p, c)[0].clamp(max=100)),
+            # same Otsu-binarized FM as dibco_metrics, so every matrix cell shares one metric
+            'fm': float(fmeasure(otsu_binarize(pred), clean < 0.5))}
 
 
 def _mean(rows, key):

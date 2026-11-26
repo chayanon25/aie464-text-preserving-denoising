@@ -35,7 +35,7 @@ DIBCO_VAL_TILE = 1024
 class JobConfig:
     job_id: str
     model: str
-    data: str = 'kaggle'                 # 'kaggle' | 'dibco'
+    data: str = 'kaggle'                 # 'kaggle' | 'augraphy' | 'dibco'
     epochs: int | None = None            # filled in after the pilot (Task 12)
     samples_per_epoch: int | None = None
     edge_weight: float = 0.1
